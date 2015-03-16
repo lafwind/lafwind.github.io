@@ -5,10 +5,97 @@
   <id>http://lafwind.github.io</id>
   <link href="http://lafwind.github.io"/>
   <link href="http://lafwind.github.io/feed.xml" rel="self"/>
-  <updated>2015-03-14T17:36:00+08:00</updated>
+  <updated>2015-03-15T21:13:00+08:00</updated>
   <author>
     <name>Lafwind</name>
   </author>
+  <entry>
+    <title>如何为Github上的开源项目贡献代码</title>
+    <link rel="alternate" href="http://lafwind.github.io/contributing-to-open-source-on-github.html"/>
+    <id>http://lafwind.github.io/contributing-to-open-source-on-github.html</id>
+    <published>2015-03-15T21:13:00+08:00</published>
+    <updated>2015-03-16T21:01:50+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;以前一直只将Github作为自己的代码仓库，当然也start了好多项目，但却从未尝试过它的另一个重要功能：协作开发。当然，为开源项目贡献代码一直是自己想做的，之所以未曾做过，主要原因是没信心，觉得自己能力还不够，拖着拖着就到现在了（和写博客有异曲同工之处= =）。而之所以现在开始的原因嘛，很直接，不想拖了！当然担心还是有的，不过谁不是一步一步开始的呢~~ &lt;/p&gt;
+
+&lt;p&gt;下文讲的是向开源项目提交代码的流程，尽量简洁。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;假设你所要贡献代码的开源项目为&lt;strong&gt;A&lt;/strong&gt;，具体流程如下：&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;1 查看项目的CONTRIBUTING。这是项目所有者所希望的贡献者参与项目和提交代码时的规范。一般在项目里或README介绍里会有该文件或该内容。应根据这些内容来执行下面的步骤。比如：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Contributing&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Fork it&lt;/li&gt;
+&lt;li&gt;Create your feature branch (git checkout -b my-new-feature)&lt;/li&gt;
+&lt;li&gt;Commit your changes (git commit -am &amp;lsquo;Add some feature&amp;rsquo;)&lt;/li&gt;
+&lt;li&gt;Push to the branch (git push origin my-new-feature)&lt;/li&gt;
+&lt;li&gt;Create new Pull Request&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;2 Fork该项目。到该项目github页面上，点击位于右上角的&lt;code&gt;Fork&lt;/code&gt;按钮。此后该项目就会出现在自己的repo页，称为&lt;strong&gt;B&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;3 回到自己的github repo页，将自己fork的项目（&lt;strong&gt;B&lt;/strong&gt;）clone到本地。&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;git clone https://github.com/YOURNAME/YOURFORK.git &lt;span class="c"&gt;# (B)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;4 设定一个远端upstream repo，此时即原始的项目&lt;strong&gt;A&lt;/strong&gt;。因为之后你修改的代码是要回到这里的，这也才能达到贡献的目的。&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git &lt;span class="c"&gt;# (A)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;完成上述两个步骤后，可以使用以下命令，看看有没有添加完成：&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;git remote -v &lt;span class="c"&gt;#应该看到fork后自己的repo和公共项目的repo&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;5 同步远端上游库（upstream repo，即&lt;strong&gt;A&lt;/strong&gt;），这能让你的代码保持最新。之后如持续为项目提交代码，应时常进行该同步。 
+  &amp;ldquo;`shell
+  $ git fetch upstream&lt;/p&gt;
+
+&lt;p&gt;# 回到自己的master分支
+  $ git checkout master&lt;/p&gt;
+
+&lt;p&gt;# 合并刚刚同步的upstream/master 最新版本
+  $ git merge upstream/master
+  &amp;rdquo;`&lt;/p&gt;
+
+&lt;p&gt;6 为该项目建立一个feature分支。&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;git checkout -b feature
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;7 修改或添加代码。&lt;/p&gt;
+
+&lt;p&gt;8 commit 并 push 到自己的远端仓库（即&lt;strong&gt;B&lt;/strong&gt;）。此时你可以选择push这feature分支，或者将它合到你的master分支再提交都可。具体应该参考这个项目的CONTRIBUTING。&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="c"&gt;# 先git add 和 git commit&lt;/span&gt;
+  &lt;span class="nv"&gt;$ &lt;/span&gt;git push -u origin feature &lt;span class="c"&gt;# 取决于CONTRIBUTING或你&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;9 然后回到自己的github页面，在branch选择部分选取自己刚修改的那个分支。选完后点选左边绿色按钮。这时开始&lt;code&gt;pull request&lt;/code&gt;。这时会看到自己修改后的代码分支和upstrean（&lt;strong&gt;A&lt;/strong&gt;）的比较页面。如没问题，直接提交。&lt;/p&gt;
+
+&lt;p&gt;填写一些相应信息（如自己的这个feature分支解决了什么问题或有什么功能等）。&lt;/p&gt;
+
+&lt;p&gt;以上就是提交代码的整个流程。如再有新的提交重复5-9即可。&lt;/p&gt;
+
+&lt;p&gt;执行好上述几个步骤即可以为开源项目提交代码。不过如果想见到这些修改真的合并到这个主项目。你还需要等待项目所有者的审核。如果ok，那就皆大欢喜。不ok的话，则你还可在继续修改，继续提交。一切由你。&lt;/p&gt;
+
+&lt;p&gt;还有注意的是，经常看issue（可能是一些bug反馈，一些项目建议什么的）和pull request（并不是自己去pull request，而是看别人的，点击项目右边的相应链接，在code栏下），可以更好的融入到该项目的节奏中，也更好的达到协作开发的目的。推荐Github官方出品的&lt;a href="https://guides.github.com/activities/contributing-to-open-source/"&gt;教程&lt;/a&gt;，更好的了解协作过程中的“礼仪”。&lt;/p&gt;
+
+&lt;p&gt;好了，开始享受这份乐趣吧!&lt;/p&gt;
+
+&lt;p&gt;如下是参考链接：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://guides.github.com/activities/contributing-to-open-source/"&gt;Contributing to Open Source on GitHub（官方guide）&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://help.github.com/articles/configuring-a-remote-for-a-fork/"&gt;Configuring a remote for a fork&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://help.github.com/articles/syncing-a-fork/"&gt;Syncing a fork&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://help.github.com/articles/syncing-a-fork/"&gt;Creating a pull request&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
   <entry>
     <title>CSS学习笔记(1) --- Position，Font</title>
     <link rel="alternate" href="http://lafwind.github.io/thinking-in-css.html"/>
