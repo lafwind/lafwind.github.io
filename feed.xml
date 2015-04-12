@@ -5,10 +5,162 @@
   <id>http://lafwind.github.io</id>
   <link href="http://lafwind.github.io"/>
   <link href="http://lafwind.github.io/feed.xml" rel="self"/>
-  <updated>2015-03-15T21:13:00+08:00</updated>
+  <updated>2015-04-11T21:26:00+08:00</updated>
   <author>
     <name>Lafwind</name>
   </author>
+  <entry>
+    <title>Ruby对象模型（2）</title>
+    <link rel="alternate" href="http://lafwind.github.io/the-object-model-of-ruby-2.html"/>
+    <id>http://lafwind.github.io/the-object-model-of-ruby-2.html</id>
+    <published>2015-04-11T21:26:00+08:00</published>
+    <updated>2015-04-11T22:02:41+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;介绍完这些概念后，该进入主题了——对象模型。其实说白了，就是XX在哪呢~&lt;/p&gt;
+
+&lt;p&gt;比如，一个对象（可能是类）调用了一个方法，这个方法到底在哪，为什么别的对象无法调用，搞清了对象模型，也就能搞定类似问题。&lt;/p&gt;
+
+&lt;p&gt;先从对象说起吧（此处不包含类，因为类相对于普通对象还具有超类这个属性）。当对象调用一个方法时，到底发生了啥？很简单，在对象模型里找方法，然后调用之。而这个寻找的路径，也就构成了对象模型的一部分。&lt;/p&gt;
+
+&lt;p&gt;利用上面使用的ancestors方法，我们知道对象调用的方法就存在于它的祖先链中，那么针对下面这种情况呢：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"hello"&lt;/span&gt;
+
+&lt;span class="c1"&gt;# A&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;say&lt;/span&gt;
+  &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; String&lt;/span&gt;
+&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;say&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; "hello"&lt;/span&gt;
+
+&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"en"&lt;/span&gt;
+&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; String&lt;/span&gt;
+&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;say&lt;/span&gt;   &lt;span class="c1"&gt;# undefined method `say' for "en":String (NoMethodError)&lt;/span&gt;
+
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;String&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;明显，a和b都是String类生成的对象，但是在经过定义后，a对象拥有了say()方法，而b对象则无此方法，再看两者的祖先链，明显仍是一样的，那么此时say()方法放在哪呢？&lt;/p&gt;
+
+&lt;p&gt;这就涉及到eigenclass，上面程序中，在A处为a对象定义了只属于a的方法（单件方法），而这些方法就存在a的eigenclass中，a是这个eigenclass的唯一实例（且eigenclass不能被继承）。再看代码：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;eigenclass&lt;/span&gt;
+    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="nb"&gt;self&lt;/span&gt;
+      &lt;span class="nb"&gt;self&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;M&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"hello"&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;N&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;M&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;
+
+&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"eigenclass"&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;
+
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt;
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;因此，现在可以总结普通对象部分的对象模型了：&lt;/p&gt;
+
+&lt;p&gt;每个普通对象都有自己真正的类，这个类可能是普通类，也可能是eigenclass，如果是eigenclass，则eigenclass的父类是&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Ruby对象模型（1）</title>
+    <link rel="alternate" href="http://lafwind.github.io/the-object-model-of-ruby-1.html"/>
+    <id>http://lafwind.github.io/the-object-model-of-ruby-1.html</id>
+    <published>2015-04-10T21:20:00+08:00</published>
+    <updated>2015-04-11T22:02:41+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;这段时间重新温习了《Ruby 元编程》，对里面的内容，相较于第一次看，又有了一些新的认识。为此整理了一些笔记（条目型的），如有兴趣，&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby"&gt;点击&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;本系列文章主要想谈谈Ruby中的对象模型。作为一名想要深入学习和了解Ruby的程序员，理解Ruby的对象模型是相当必要的。&lt;/p&gt;
+
+&lt;p&gt;Ruby作为一门面向对象语言，对象在Ruby程序中随处可见，当然除了对象，类（class）、模块（module）实例变量（instance variable）也包含其中，而所有这些语言构建存在的系统，就是我们要讨论的对象模型。&lt;/p&gt;
+
+&lt;p&gt;首先谈谈对象吧。简而言之，对象就是一组实例变量加一个指向其类的引用。对象调用的方法呢？是的，方法不存在于对象中，而是在对象所属的类里。对象由类生成，因此对象拥有了在类里面定义的方法。实例变量是在方法里带有@符号的变量。看如下代码：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt;
+  &lt;span class="c1"&gt;# 方法&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;my_method&lt;/span&gt;
+    &lt;span class="vi"&gt;@v1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="c1"&gt;# 实例变量&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;
+&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;my_method&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; #&amp;lt;MyClass:0x007f691e8577d8 @v1=1&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接着是类。类也是对象，由Class类生成，同时就如上面所说，类里面定义了一组方法，这些方法供对象调用，所以这是一些实例方法。类和对象不同的最后一点是，类有超类（继承），对象没有，所以类中还包含了对其超类的引用。&lt;/p&gt;
+
+&lt;p&gt;所以综上可得，类中包含：一组实例变量，对类的类的引用，对类的超类的引用和一组实例方法。&lt;/p&gt;
+
+&lt;p&gt;模块。类的超类，类比它多加了三个方法，new()，allocate()，superclass()。而这几个方法使类可以创建对象并将对象纳入类体系架构。除此之外&lt;em&gt;绝大多数适用于类的内容同样适用于模块，反之亦然&lt;/em&gt;。&lt;/p&gt;
+
+&lt;p&gt;用代码理清下类和模块的关系，打开irb：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+&lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; [MyClass, Object, Kernel, BasicObject]&lt;/span&gt;
+
+&lt;span class="no"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; Module&lt;/span&gt;
+
+&lt;span class="no"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;         &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+&lt;span class="no"&gt;Module&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;        &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+&lt;span class="no"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;        &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+&lt;span class="no"&gt;BasicObject&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 所有类都是由Class生成的对象&lt;/span&gt;
+
+&lt;span class="no"&gt;Kernel&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;        &lt;span class="c1"&gt;# =&amp;gt; Module&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在上面的代码中，MyClass的祖先链中，混入了不是类的奇怪生物Kernel，为什么它会在这里？答案是该模块被Object包含，被包含的模块在祖先链中处于包含该模块的类的正上方，代码：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;O&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;P&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;Q&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;R&lt;/span&gt;
+  &lt;span class="kp"&gt;include&lt;/span&gt; &lt;span class="no"&gt;O&lt;/span&gt;
+  &lt;span class="kp"&gt;include&lt;/span&gt; &lt;span class="no"&gt;P&lt;/span&gt;
+  &lt;span class="kp"&gt;include&lt;/span&gt; &lt;span class="no"&gt;Q&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;R&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; [R, Q, P, O, Object, Kernel, BasicObject]&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出现这样的结果，是因为R首先包含了模块O，O就出现在R的正上方，接着包含了P，P就出现在R的正上方，这样O就向上移了一辈，再来是Q出现在R正上方，O、P向上移一辈，所以就出现这样的结果，如有包含更多模块，只需以此类推。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>如何为Github上的开源项目贡献代码</title>
     <link rel="alternate" href="http://lafwind.github.io/contributing-to-open-source-on-github.html"/>
