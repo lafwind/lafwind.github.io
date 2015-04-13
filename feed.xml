@@ -14,13 +14,15 @@
     <link rel="alternate" href="http://lafwind.github.io/the-object-model-of-ruby-2.html"/>
     <id>http://lafwind.github.io/the-object-model-of-ruby-2.html</id>
     <published>2015-04-11T21:26:00+08:00</published>
-    <updated>2015-04-11T22:02:41+08:00</updated>
+    <updated>2015-04-12T22:38:25+08:00</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <content type="html">&lt;p&gt;介绍完这些概念后，该进入主题了——对象模型。其实说白了，就是XX在哪呢~&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;a href="https:"&gt;前文&lt;/a&gt;介绍了对象、类、模块等的概念后，该正式进入主题了——对象模型。其实说白了，就是XX在哪呢~&lt;/p&gt;
 
 &lt;p&gt;比如，一个对象（可能是类）调用了一个方法，这个方法到底在哪，为什么别的对象无法调用，搞清了对象模型，也就能搞定类似问题。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;P.S: 由于类也是对象，由Class类生成，为了便于行文，把这种对象称为类对象&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;先从对象说起吧（此处不包含类，因为类相对于普通对象还具有超类这个属性）。当对象调用一个方法时，到底发生了啥？很简单，在对象模型里找方法，然后调用之。而这个寻找的路径，也就构成了对象模型的一部分。&lt;/p&gt;
 
@@ -45,7 +47,8 @@
 &lt;p&gt;明显，a和b都是String类生成的对象，但是在经过定义后，a对象拥有了say()方法，而b对象则无此方法，再看两者的祖先链，明显仍是一样的，那么此时say()方法放在哪呢？&lt;/p&gt;
 
 &lt;p&gt;这就涉及到eigenclass，上面程序中，在A处为a对象定义了只属于a的方法（单件方法），而这些方法就存在a的eigenclass中，a是这个eigenclass的唯一实例（且eigenclass不能被继承）。再看代码：&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;
   &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;eigenclass&lt;/span&gt;
     &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="nb"&gt;self&lt;/span&gt;
       &lt;span class="nb"&gt;self&lt;/span&gt;
@@ -54,8 +57,13 @@
 &lt;span class="k"&gt;end&lt;/span&gt;
 
 &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;M&lt;/span&gt;
+
   &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
-    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"hello"&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"M"&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;world&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"world"&lt;/span&gt;
   &lt;span class="k"&gt;end&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
 
@@ -63,25 +71,41 @@
 
 &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;
 
-&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;
+&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; M&lt;/span&gt;
+&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;world&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; world&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;               &lt;span class="c1"&gt;# =&amp;gt; [N, M, Object, Kernel, BasicObject]&lt;/span&gt;
 
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;
   &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
     &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"eigenclass"&lt;/span&gt;
   &lt;span class="k"&gt;end&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
 
-&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;
+&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; eigenclass&lt;/span&gt;
+&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;world&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; world&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;               &lt;span class="c1"&gt;# =&amp;gt; [N, M, Object, Kernel, BasicObject]&lt;/span&gt;
 
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;              &lt;span class="c1"&gt;# =&amp;gt; #&amp;lt;Class:#&amp;lt;N:0x007fd209499f20&amp;gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;        &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; N&lt;/span&gt;
 
 
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;因此，现在可以总结普通对象部分的对象模型了：&lt;/p&gt;
 
-&lt;p&gt;每个普通对象都有自己真正的类，这个类可能是普通类，也可能是eigenclass，如果是eigenclass，则eigenclass的父类是&lt;/p&gt;
+&lt;p&gt;每个普通对象都有自己真正的类，这个类可能是普通类，也可能是eigenclass，如果是eigenclass，则eigenclass的父类是生成该对象的类（上述例子中是N）；如果没有eigenclass，那么就是普通类（上述例子中是N），以上面的例子看，有如下两情况：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;未加入单件方法：n -&amp;gt; N -&amp;gt; M -&amp;gt; Object -&amp;gt; Kernel -&amp;gt; BasicObject&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;加入单件方法后：n -&amp;gt; eigenclass -&amp;gt; N -&amp;gt; M -&amp;gt; Object -&amp;gt; Kernel -&amp;gt; BasicObject&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;方法查找也是根据属于上面何种情况来进行，n为对象本身，之后为n的祖先链。&lt;/p&gt;
+
+&lt;p&gt;这就是普通对象的对象模型。在脑中存有这个模型图像，至于如何定义单件方法及一些相关详情，可参考《Ruby 元编程》相关笔记&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby/blob/master/chapter_1.markdown"&gt;1&lt;/a&gt;，&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby/blob/master/chapter_4.markdown"&gt;2&lt;/a&gt;，或上网查询。&lt;/p&gt;
+
+&lt;p&gt;这篇文章完成了普通对象的对象模型，后续还有类对象的对象模型和其他内容。&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -89,11 +113,11 @@
     <link rel="alternate" href="http://lafwind.github.io/the-object-model-of-ruby-1.html"/>
     <id>http://lafwind.github.io/the-object-model-of-ruby-1.html</id>
     <published>2015-04-10T21:20:00+08:00</published>
-    <updated>2015-04-11T22:02:41+08:00</updated>
+    <updated>2015-04-12T21:56:05+08:00</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <content type="html">&lt;p&gt;这段时间重新温习了《Ruby 元编程》，对里面的内容，相较于第一次看，又有了一些新的认识。为此整理了一些笔记（条目型的），如有兴趣，&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby"&gt;点击&lt;/a&gt;。&lt;/p&gt;
+    <content type="html">&lt;p&gt;这段时间重温了《Ruby 元编程》，对里面的内容，相较于第一次看，又有了一些新的认识。为此整理了一些笔记（条目型的），如有兴趣，&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby"&gt;点击&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;本系列文章主要想谈谈Ruby中的对象模型。作为一名想要深入学习和了解Ruby的程序员，理解Ruby的对象模型是相当必要的。&lt;/p&gt;
 
@@ -116,16 +140,15 @@
 
 &lt;p&gt;所以综上可得，类中包含：一组实例变量，对类的类的引用，对类的超类的引用和一组实例方法。&lt;/p&gt;
 
-&lt;p&gt;模块。类的超类，类比它多加了三个方法，new()，allocate()，superclass()。而这几个方法使类可以创建对象并将对象纳入类体系架构。除此之外&lt;em&gt;绝大多数适用于类的内容同样适用于模块，反之亦然&lt;/em&gt;。&lt;/p&gt;
+&lt;p&gt;模块。类的超类，类比它多加了三个方法，new()，allocate()，superclass()。而这几个方法使类可以创建对象并将对象纳入类体系架构。除此之外，&lt;em&gt;绝大多数适用于类的内容同样适用于模块，反之亦然&lt;/em&gt;。&lt;/p&gt;
 
 &lt;p&gt;用代码理清下类和模块的关系，打开irb：&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;end&lt;/span&gt;
 
-&lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
-&lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; [MyClass, Object, Kernel, BasicObject]&lt;/span&gt;
+&lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;       &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
+&lt;span class="no"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; [MyClass, Object, Kernel, BasicObject]&lt;/span&gt;
 
-&lt;span class="no"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; Module&lt;/span&gt;
+&lt;span class="no"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt;    &lt;span class="c1"&gt;# =&amp;gt; Module&lt;/span&gt;
 
 &lt;span class="no"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;         &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
 &lt;span class="no"&gt;Module&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;        &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
@@ -138,7 +161,7 @@
 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;在上面的代码中，MyClass的祖先链中，混入了不是类的奇怪生物Kernel，为什么它会在这里？答案是该模块被Object包含，被包含的模块在祖先链中处于包含该模块的类的正上方，代码：&lt;/p&gt;
+&lt;p&gt;在上面的代码中，MyClass的祖先链中，混入了不是类的奇怪生物Kernel，为什么它会在这里？答案是该模块被Object包含，被包含的模块在祖先链中处于包含该模块的类的正上方，看下面例子：&lt;/p&gt;
 &lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;module&lt;/span&gt; &lt;span class="nn"&gt;O&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
 
@@ -159,6 +182,8 @@
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;出现这样的结果，是因为R首先包含了模块O，O就出现在R的正上方，接着包含了P，P就出现在R的正上方，这样O就向上移了一辈，再来是Q出现在R正上方，O、P向上移一辈，所以就出现这样的结果，如有包含更多模块，只需以此类推。&lt;/p&gt;
+
+&lt;p&gt;第一部分先把这几个概念理清，后续将开始接触对象模型的相关内容。&lt;/p&gt;
 </content>
   </entry>
   <entry>
