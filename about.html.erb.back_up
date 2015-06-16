@@ -1,0 +1,131 @@
+<div class="about">
+  <h5>hello，此处施工中～！部分信息是乱填的～！具体信息以施工完结后为准～！！</h5>
+  <div class="bio">
+    <img src="http://tp3.sinaimg.cn/3211644054/180/5677586438/1" alt="bio-graph">
+    <span>
+      vimer, rubyist, linuxer
+      <br>
+      先这样~
+    </span>
+  </div>
+
+  <div class="clearfix">
+  </div>
+
+  <div class="intro">
+    <h5>Welcome: </h5>
+    <div class="sayhi">
+      <p>Hi，我是Lafwind 。这是我的博客。</p>
+    </div>
+  </div>
+
+  <div class="skill">
+    <h5>Skill: </h5>
+    <div class="dot-area">
+      <div class="skill-name">
+        <p>
+          ruby: <br>
+          html: <br>
+          css: <br>
+          javascript: <br>
+        </p>
+      </div>
+      <div class="dot">
+        <p>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-half"></div>
+          <div class="dot-empty"></div>
+          <br>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-empty"></div>
+          <div class="dot-empty"></div>
+          <br>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-empty"></div>
+          <div class="dot-empty"></div>
+          <br>
+          <div class="dot-full"></div>
+          <div class="dot-full"></div>
+          <div class="dot-half"></div>
+          <div class="dot-empty"></div>
+          <div class="dot-empty"></div>
+        </p>
+      </div>
+    </div>
+    <div class="clearfix">
+    </div>
+    <div class="skill-detail">
+        blablabla~~~
+    </div>
+  </div>
+
+  <div class="project">
+    <h5>Project: </h5>
+    <p>
+      <ul>
+        <li>
+          <%= link_to "Share Link", "https://github.com/lafwind/share_link" %>
+          <span class="btn-space">
+            <%= link_to 'source', '#', class: 'btn'%>
+          </span>
+          <div class="detail">
+            A place to share your links and find more cool sites.
+          </div>
+        </li>
+        <li>
+          <%= link_to "Todo List", "https://github.com/lafwind/todo_list" %>
+          <span class="btn-space">
+            <%= link_to 'source', '#', class: 'btn' %>
+          </span>
+          <div class="detail">
+            A simple todo list web app.
+          </div>
+        </li>
+        <li>
+          <%= link_to "Github detail", "https://github.com/lafwind/github_detail" %>
+          <span class="btn-space">
+            <%= link_to 'source', '#', class: 'btn'%>
+          </span>
+          <div class="detail">
+            Get info from your github.
+          </div>
+        </li>
+        <li class="more">
+          <%= link_to "More...", "https://github.com/lafwind" %>
+        </li>
+      </ul>
+    </p>
+  </div>
+
+  <div>
+    <h5>Contact me: </h5>
+    <div class="contact-area">
+      <div class="contact">
+        <p>
+          Email<br />
+          Follow Me at Twitter<br />
+          Follow Me at Github<br />
+          My Blog
+        </p>
+      </div>
+
+      <div class="contact">
+        <p>
+          <%= link_to 'lafwind#gmail.com'%><br />
+          <%= link_to '@lafwind', 'https://twitter.com/lafwind' %><br />
+          <%= link_to '@lafwind', 'https://www.github.com/lafwind' %><br />
+          <%= link_to 'Lafwind\' blog', 'https://lafwind.github.io' %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="clearfix">
+  </div>
+</div>
