@@ -74,7 +74,7 @@
 <p>明显，a和b都是String类生成的对象，但是在经过定义后，a对象拥有了say()方法，而b对象则无此方法，再看两者的祖先链，明显仍是一样的，那么此时say()方法放在哪呢？</p>
 
 <p>这就涉及到eigenclass，上面程序中，在A处为a对象定义了只属于a的方法（单件方法），而这些方法就存在a的eigenclass中，a是这个eigenclass的唯一实例（且eigenclass不能被继承）。再看代码：</p>
-<pre class="highlight ruby"><code>
+<pre class="highlight ruby"><code><span class="c1"># 给每个对象定义eigenclass方法</span>
 <span class="k">class</span> <span class="nc">Object</span>
   <span class="k">def</span> <span class="nf">eigenclass</span>
     <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
@@ -84,7 +84,6 @@
 <span class="k">end</span>
 
 <span class="k">class</span> <span class="nc">M</span>
-
   <span class="k">def</span> <span class="nf">hello</span>
     <span class="nb">puts</span> <span class="s2">"M"</span>
   <span class="k">end</span>

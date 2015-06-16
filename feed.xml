@@ -144,7 +144,7 @@ Firefox大概从它的1.x版本开始用。配合着Vimperator、adblock plus等
     <link rel="alternate" href="http://lafwind.github.io/the-object-model-of-ruby-2.html"/>
     <id>http://lafwind.github.io/the-object-model-of-ruby-2.html</id>
     <published>2015-04-11T21:26:00+08:00</published>
-    <updated>2015-04-12T22:38:25+08:00</updated>
+    <updated>2015-06-16T21:14:22+08:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -177,7 +177,7 @@ Firefox大概从它的1.x版本开始用。配合着Vimperator、adblock plus等
 &lt;p&gt;明显，a和b都是String类生成的对象，但是在经过定义后，a对象拥有了say()方法，而b对象则无此方法，再看两者的祖先链，明显仍是一样的，那么此时say()方法放在哪呢？&lt;/p&gt;
 
 &lt;p&gt;这就涉及到eigenclass，上面程序中，在A处为a对象定义了只属于a的方法（单件方法），而这些方法就存在a的eigenclass中，a是这个eigenclass的唯一实例（且eigenclass不能被继承）。再看代码：&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# 给每个对象定义eigenclass方法&lt;/span&gt;
 &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;
   &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;eigenclass&lt;/span&gt;
     &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="nb"&gt;self&lt;/span&gt;
@@ -187,7 +187,6 @@ Firefox大概从它的1.x版本开始用。配合着Vimperator、adblock plus等
 &lt;span class="k"&gt;end&lt;/span&gt;
 
 &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;M&lt;/span&gt;
-
   &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
     &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"M"&lt;/span&gt;
   &lt;span class="k"&gt;end&lt;/span&gt;
