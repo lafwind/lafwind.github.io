@@ -5,10 +5,65 @@
   <id>http://lafwind.github.io</id>
   <link href="http://lafwind.github.io"/>
   <link href="http://lafwind.github.io/feed.xml" rel="self"/>
-  <updated>2015-06-11T23:01:00+08:00</updated>
+  <updated>2015-06-22T23:52:00+08:00</updated>
   <author>
     <name>Lafwind</name>
   </author>
+  <entry>
+    <title>Rails 中的 cache（一）</title>
+    <link rel="alternate" href="http://lafwind.github.io/cache-in-rails.html"/>
+    <id>http://lafwind.github.io/cache-in-rails.html</id>
+    <published>2015-06-22T23:52:00+08:00</published>
+    <updated>2015-06-25T00:42:30+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;其实，写这篇文章，自己有点心虚……首先，内容有点大；其次，我几乎没有在Rails中使用cache的经验= =，因为项目还没有这个需要T.T（Donald Knuth曾说过“过早的优化是万恶之源”，这是自我安慰吗～？），但是由于这几天都在看有关优化方面的内容，比如 &lt;a href="http://thenewstack.io/how-to-write-ruby-faster-at-the-source-code-level/"&gt;How To Write Ruby Faster at the Source Code Level&lt;/a&gt;，&lt;a href="https://github.com/JuanitoFatas/fast-ruby"&gt;fast-ruby&lt;/a&gt; 以及cache相关的内容，所以就想把相关内容记录下来，以备将来之需！&lt;/p&gt;
+
+&lt;p&gt;p.s.：之所以在未经充分实践就把文章写下来的最主要原因是：平时自己就喜欢乱看东西，比如曾经看了haskell，go等，但由于没有实践，现在都差不多忘了，以至于白白浪费了之前的学习，为了避免重蹈覆辙，决定把学到的东西（不管开始用没）记录下来，当之后用到时也能通过这些文章更快地进入状态，这也是我之前说的想要写博客的原因之一；而这也从另一方面督促自己，还有很多东西没做呢！要把时间花在刀刃上！&lt;/p&gt;
+
+&lt;p&gt;言归正传，就如上文所说，cache的内容有点多，有服务器端的、客户端的及一些页面相关的，在此次文章中，我主要想看看rails中的&lt;a href="http://guides.rubyonrails.org/caching_with_rails.html"&gt;Fragment Caching&lt;/a&gt;。这种缓存是把视图逻辑中的一部分打包到cache块中，之后的请求就会从缓存中取得这部分的内容。比如在一个图片网站中（像&lt;a href="https://impage.herokuapp.com/"&gt;Impage&lt;/a&gt; ; )），一般情况，图片的内容是不会变的，但是评论的内容则会慢慢增加，这种情况下，就可以将图片部分的相关视图缓存起来，而不用每次都像数据库发出请求，以此提高速度。代码方面如下：&lt;/p&gt;
+&lt;pre class="highlight haml"&gt;&lt;code&gt;# example
+&lt;span class="p"&gt;-&lt;/span&gt; &lt;span class="n"&gt;cache&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="vi"&gt;@post&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="nt"&gt;%p&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="vi"&gt;@post&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;title&lt;/span&gt;
+  &lt;span class="nt"&gt;%span&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="vi"&gt;@post&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;email&lt;/span&gt;
+  &lt;span class="p"&gt;-&lt;/span&gt; &lt;span class="vi"&gt;@post&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;tag_list&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;tag&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;link_to&lt;/span&gt; &lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;tag&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;root_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;tag: &lt;/span&gt;&lt;span class="n"&gt;tag&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="ss"&gt;class: &lt;/span&gt;&lt;span class="s2"&gt;"btn"&lt;/span&gt;
+  &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;image_tag&lt;/span&gt; &lt;span class="vi"&gt;@post&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:large&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="nt"&gt;%p&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="vi"&gt;@post&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;description&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面是一个使用fragment caching的例子，而cache[@post]会生成类似下列的key：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;views/posts/3-20150616162219/2432435927aed37957c2139709&lt;/code&gt;，这个键包含模型名，post的id和最后更新时间updated_at，所以当post出现更新时（即updated_at更改），这个post才会生成一个新的缓存，而旧的缓存就不再管理，等到缓存满了后会利用LRU自动清理。&lt;/p&gt;
+
+&lt;p&gt;除了上述的自动更新缓存外，也可以利用&lt;code&gt;expire_fragment&lt;/code&gt;方法来手动清除缓存。&lt;/p&gt;
+
+&lt;p&gt;以上是fragment cache的一些基本内容。试想在这样一种情况下：缓存了一个大页面，此时有一个小小的section更新了，那么这个大页面的缓存也必须得更新，这样显然降低了效率。应对这种情况，rails提供了嵌套方式来重用缓存，如：&lt;/p&gt;
+&lt;pre class="highlight haml"&gt;&lt;code&gt;# example 伪代码
+&lt;span class="p"&gt;-&lt;/span&gt; &lt;span class="n"&gt;cache&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="vi"&gt;@posts&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;-&lt;/span&gt; &lt;span class="vi"&gt;@posts&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;post&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="p"&gt;-&lt;/span&gt; &lt;span class="n"&gt;cache&lt;/span&gt; &lt;span class="n"&gt;post&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样当有一个post更新时，就仅更新该post的缓存，然后重新和其他post的缓存（沿用之前的）拼接，提高了效率，这种机制称为Russian Doll机制（套娃机制）。而在1:1或1：n（belongs_to）的情况下，比如：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Item&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;ActiveRecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;
+    &lt;span class="n"&gt;belongs_to&lt;/span&gt; &lt;span class="ss"&gt;:list&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;此时，在item更新时，并不会提示list的缓存也更新，解决的方法是利用touch属性：&lt;/p&gt;
+&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Item&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;Activerecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;
+    &lt;span class="n"&gt;belongs_to&lt;/span&gt; &lt;span class="ss"&gt;:list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;touch: &lt;/span&gt;&lt;span class="kp"&gt;true&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样，当item更新，list也会跟着更新，有关套娃机制的内容，请参看Ruby-China上的&lt;a href="https://ruby-china.org/topics/21488"&gt;说说 Rails 的套娃缓存机制&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;上述就是这两天对于fragment cache的学习，之后会对其进行实践，如有新的理解，会接着更新。而后续也会对其他cache进行学习。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>My tools</title>
     <link rel="alternate" href="http://lafwind.github.io/my-tools.html"/>
@@ -137,104 +192,6 @@ Firefox大概从它的1.x版本开始用。配合着Vimperator、adblock plus等
       <name>Article Author</name>
     </author>
     <content type="html">&lt;p&gt;在&lt;a href="https:"&gt;上篇&lt;/a&gt;说完普通对象的对象模型，这次该讨论类对象的对象模型了。待续！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Ruby对象模型（2）</title>
-    <link rel="alternate" href="http://lafwind.github.io/the-object-model-of-ruby-2.html"/>
-    <id>http://lafwind.github.io/the-object-model-of-ruby-2.html</id>
-    <published>2015-04-11T21:26:00+08:00</published>
-    <updated>2015-06-16T21:14:22+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;&lt;a href="https:"&gt;前文&lt;/a&gt;介绍了对象、类、模块等的概念后，该正式进入主题了——对象模型。其实说白了，就是XX在哪呢~&lt;/p&gt;
-
-&lt;p&gt;比如，一个对象（可能是类）调用了一个方法，这个方法到底在哪，为什么别的对象无法调用，搞清了对象模型，也就能搞定类似问题。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;P.S: 由于类也是对象，由Class类生成，为了便于行文，把这种对象称为类对象&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;先从对象说起吧（此处不包含类，因为类相对于普通对象还具有超类这个属性）。当对象调用一个方法时，到底发生了啥？很简单，在对象模型里找方法，然后调用之。而这个寻找的路径，也就构成了对象模型的一部分。&lt;/p&gt;
-
-&lt;p&gt;利用上面使用的ancestors方法，我们知道对象调用的方法就存在于它的祖先链中，那么针对下面这种情况呢：&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"hello"&lt;/span&gt;
-
-&lt;span class="c1"&gt;# A&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;say&lt;/span&gt;
-  &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; String&lt;/span&gt;
-&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;say&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; "hello"&lt;/span&gt;
-
-&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"en"&lt;/span&gt;
-&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="c1"&gt;# =&amp;gt; String&lt;/span&gt;
-&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;say&lt;/span&gt;   &lt;span class="c1"&gt;# undefined method `say' for "en":String (NoMethodError)&lt;/span&gt;
-
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;String&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;明显，a和b都是String类生成的对象，但是在经过定义后，a对象拥有了say()方法，而b对象则无此方法，再看两者的祖先链，明显仍是一样的，那么此时say()方法放在哪呢？&lt;/p&gt;
-
-&lt;p&gt;这就涉及到eigenclass，上面程序中，在A处为a对象定义了只属于a的方法（单件方法），而这些方法就存在a的eigenclass中，a是这个eigenclass的唯一实例（且eigenclass不能被继承）。再看代码：&lt;/p&gt;
-&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;span class="c1"&gt;# 给每个对象定义eigenclass方法&lt;/span&gt;
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;
-  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;eigenclass&lt;/span&gt;
-    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="nb"&gt;self&lt;/span&gt;
-      &lt;span class="nb"&gt;self&lt;/span&gt;
-    &lt;span class="k"&gt;end&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;M&lt;/span&gt;
-  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
-    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"M"&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-
-  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;world&lt;/span&gt;
-    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"world"&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;N&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;M&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;new&lt;/span&gt;
-
-&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; M&lt;/span&gt;
-&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;world&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; world&lt;/span&gt;
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;               &lt;span class="c1"&gt;# =&amp;gt; [N, M, Object, Kernel, BasicObject]&lt;/span&gt;
-
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;
-  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;hello&lt;/span&gt;
-    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;"eigenclass"&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; eigenclass&lt;/span&gt;
-&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;world&lt;/span&gt;                     &lt;span class="c1"&gt;# =&amp;gt; world&lt;/span&gt;
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="no"&gt;N&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;ancestors&lt;/span&gt;               &lt;span class="c1"&gt;# =&amp;gt; [N, M, Object, Kernel, BasicObject]&lt;/span&gt;
-
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;              &lt;span class="c1"&gt;# =&amp;gt; #&amp;lt;Class:#&amp;lt;N:0x007fd209499f20&amp;gt;&amp;gt;&lt;/span&gt;
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;class&lt;/span&gt;        &lt;span class="c1"&gt;# =&amp;gt; Class&lt;/span&gt;
-&lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;eigenclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;superclass&lt;/span&gt;   &lt;span class="c1"&gt;# =&amp;gt; N&lt;/span&gt;
-
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;因此，现在可以总结普通对象部分的对象模型了：&lt;/p&gt;
-
-&lt;p&gt;每个普通对象都有自己真正的类，这个类可能是普通类，也可能是eigenclass，如果是eigenclass，则eigenclass的父类是生成该对象的类（上述例子中是N）；如果没有eigenclass，那么就是普通类（上述例子中是N），以上面的例子看，有如下两情况：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;未加入单件方法：n -&amp;gt; N -&amp;gt; M -&amp;gt; Object -&amp;gt; Kernel -&amp;gt; BasicObject&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;加入单件方法后：n -&amp;gt; eigenclass -&amp;gt; N -&amp;gt; M -&amp;gt; Object -&amp;gt; Kernel -&amp;gt; BasicObject&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;方法查找也是根据属于上面何种情况来进行，n为对象本身，之后为n的祖先链。&lt;/p&gt;
-
-&lt;p&gt;这就是普通对象的对象模型。在脑中存有这个模型图像，至于如何定义单件方法及一些相关详情，可参考《Ruby 元编程》相关笔记&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby/blob/master/chapter_1.markdown"&gt;1&lt;/a&gt;，&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby/blob/master/chapter_4.markdown"&gt;2&lt;/a&gt;，或上网查询。&lt;/p&gt;
-
-&lt;p&gt;这篇文章完成了普通对象的对象模型，后续还有类对象的对象模型和其他内容。&lt;/p&gt;
 </content>
   </entry>
 </feed>
