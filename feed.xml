@@ -14,7 +14,7 @@
     <link rel="alternate" href="http://lafwind.github.io/cache-in-rails.html"/>
     <id>http://lafwind.github.io/cache-in-rails.html</id>
     <published>2015-06-22T23:52:00+08:00</published>
-    <updated>2015-06-25T00:42:30+08:00</updated>
+    <updated>2015-06-25T00:54:18+08:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -36,7 +36,7 @@
 
 &lt;p&gt;上面是一个使用fragment caching的例子，而cache[@post]会生成类似下列的key：&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;views/posts/3-20150616162219/2432435927aed37957c2139709&lt;/code&gt;，这个键包含模型名，post的id和最后更新时间updated_at，所以当post出现更新时（即updated_at更改），这个post才会生成一个新的缓存，而旧的缓存就不再管理，等到缓存满了后会利用LRU自动清理。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;views/posts/3-20150616162219&lt;/code&gt;，这个键包含模型名，post的id和最后更新时间updated_at，所以当post出现更新时（即updated_at更改），这个post才会生成一个新的缓存，而旧的缓存就不再管理，等到缓存满了后会利用LRU自动清理。&lt;/p&gt;
 
 &lt;p&gt;除了上述的自动更新缓存外，也可以利用&lt;code&gt;expire_fragment&lt;/code&gt;方法来手动清除缓存。&lt;/p&gt;
 
