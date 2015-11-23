@@ -1,0 +1,157 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Lafwind - Ruby对象模型（2）</title>
+    <link href="../stylesheets/all.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/blog_article.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/normalize.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/syntax.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/syntax_jekyll.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/all.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="blog_detail">
+      <div class="bar_line">
+      </div>
+      <header>
+        <nav>
+<a href="../blog.html">            <span>&lt&lt</span> Blog
+</a>        </nav>
+      </header>
+      <div class="article">
+        <div class="blog_title">
+          <p>Ruby对象模型（2）</p>
+        </div>
+        <div class="blog_time">
+          <p>Apr 11, 2015</p>
+        </div>
+
+        <div class="content">
+          <p><a href="https:">前文</a>介绍了对象、类、模块等的概念后，该正式进入主题了——对象模型。其实说白了，就是XX在哪呢~</p>
+
+<p>比如，一个对象（可能是类）调用了一个方法，这个方法到底在哪，为什么别的对象无法调用，搞清了对象模型，也就能搞定类似问题。</p>
+
+<p><em>P.S: 由于类也是对象，由Class类生成，为了便于行文，把这种对象称为类对象</em></p>
+
+<p>先从对象说起吧（此处不包含类，因为类相对于普通对象还具有超类这个属性）。当对象调用一个方法时，到底发生了啥？很简单，在对象模型里找方法，然后调用之。而这个寻找的路径，也就构成了对象模型的一部分。</p>
+
+<p>利用上面使用的ancestors方法，我们知道对象调用的方法就存在于它的祖先链中，那么针对下面这种情况呢：</p>
+<pre class="highlight ruby"><code><span class="n">a</span> <span class="o">=</span> <span class="s2">"hello"</span>
+
+<span class="c1"># A</span>
+<span class="k">def</span> <span class="nc">a</span><span class="o">.</span><span class="nf">say</span>
+  <span class="nb">puts</span> <span class="n">a</span>
+<span class="k">end</span>
+
+<span class="n">a</span><span class="p">.</span><span class="nf">class</span> <span class="c1"># =&gt; String</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">say</span>   <span class="c1"># =&gt; "hello"</span>
+
+<span class="n">b</span> <span class="o">=</span> <span class="s2">"en"</span>
+<span class="n">b</span><span class="p">.</span><span class="nf">class</span> <span class="c1"># =&gt; String</span>
+<span class="n">b</span><span class="p">.</span><span class="nf">say</span>   <span class="c1"># undefined method `say' for "en":String (NoMethodError)</span>
+
+<span class="nb">p</span> <span class="no">String</span><span class="p">.</span><span class="nf">ancestors</span>
+</code></pre>
+
+<p>明显，a和b都是String类生成的对象，但是在经过定义后，a对象拥有了say()方法，而b对象则无此方法，再看两者的祖先链，明显仍是一样的，那么此时say()方法放在哪呢？</p>
+
+<p>这就涉及到eigenclass，上面程序中，在A处为a对象定义了只属于a的方法（单件方法），而这些方法就存在a的eigenclass中，a是这个eigenclass的唯一实例（且eigenclass不能被继承）。再看代码：</p>
+<pre class="highlight ruby"><code><span class="c1"># 给每个对象定义eigenclass方法</span>
+<span class="k">class</span> <span class="nc">Object</span>
+  <span class="k">def</span> <span class="nf">eigenclass</span>
+    <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+      <span class="nb">self</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">M</span>
+  <span class="k">def</span> <span class="nf">hello</span>
+    <span class="nb">puts</span> <span class="s2">"M"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">world</span>
+    <span class="nb">puts</span> <span class="s2">"world"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">N</span> <span class="o">&lt;</span> <span class="no">M</span><span class="p">;</span> <span class="k">end</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="no">N</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">n</span><span class="p">.</span><span class="nf">hello</span>                     <span class="c1"># =&gt; M</span>
+<span class="n">n</span><span class="p">.</span><span class="nf">world</span>                     <span class="c1"># =&gt; world</span>
+<span class="nb">p</span> <span class="no">N</span><span class="p">.</span><span class="nf">ancestors</span>               <span class="c1"># =&gt; [N, M, Object, Kernel, BasicObject]</span>
+
+<span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="n">n</span>
+  <span class="k">def</span> <span class="nf">hello</span>
+    <span class="nb">puts</span> <span class="s2">"eigenclass"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">n</span><span class="p">.</span><span class="nf">hello</span>                     <span class="c1"># =&gt; eigenclass</span>
+<span class="n">n</span><span class="p">.</span><span class="nf">world</span>                     <span class="c1"># =&gt; world</span>
+<span class="nb">p</span> <span class="no">N</span><span class="p">.</span><span class="nf">ancestors</span>               <span class="c1"># =&gt; [N, M, Object, Kernel, BasicObject]</span>
+
+<span class="nb">p</span> <span class="n">n</span><span class="p">.</span><span class="nf">eigenclass</span>              <span class="c1"># =&gt; #&lt;Class:#&lt;N:0x007fd209499f20&gt;&gt;</span>
+<span class="nb">p</span> <span class="n">n</span><span class="p">.</span><span class="nf">eigenclass</span><span class="p">.</span><span class="nf">class</span>        <span class="c1"># =&gt; Class</span>
+<span class="nb">p</span> <span class="n">n</span><span class="p">.</span><span class="nf">eigenclass</span><span class="p">.</span><span class="nf">superclass</span>   <span class="c1"># =&gt; N</span>
+
+
+</code></pre>
+
+<p>因此，现在可以总结普通对象部分的对象模型了：</p>
+
+<p>每个普通对象都有自己真正的类，这个类可能是普通类，也可能是eigenclass，如果是eigenclass，则eigenclass的父类是生成该对象的类（上述例子中是N）；如果没有eigenclass，那么就是普通类（上述例子中是N），以上面的例子看，有如下两情况：</p>
+
+<ol>
+<li><p>未加入单件方法：n -&gt; N -&gt; M -&gt; Object -&gt; Kernel -&gt; BasicObject</p></li>
+<li><p>加入单件方法后：n -&gt; eigenclass -&gt; N -&gt; M -&gt; Object -&gt; Kernel -&gt; BasicObject</p></li>
+</ol>
+
+<p>方法查找也是根据属于上面何种情况来进行，n为对象本身，之后为n的祖先链。</p>
+
+<p>这就是普通对象的对象模型。在脑中存有这个模型图像，至于如何定义单件方法及一些相关详情，可参考《Ruby 元编程》相关笔记<a href="https://github.com/lafwind/notes_of_metaprogramming_ruby/blob/master/chapter_1.markdown">1</a>，<a href="https://github.com/lafwind/notes_of_metaprogramming_ruby/blob/master/chapter_4.markdown">2</a>，或上网查询。</p>
+
+<p>这篇文章完成了普通对象的对象模型，后续还有类对象的对象模型和其他内容。</p>
+
+        </div>
+
+      </div>
+
+      <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+//<![CDATA[
+                  var disqus_shortname = 'lafwind';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+        <script type="text/javascript">
+//<![CDATA[
+    var disqus_shortname = 'lafwind';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script>
+
+      </div>
+
+      <footer>
+        <p>©2015 Lafwind </p>
+        <p>Theme is designed by <a href="../">Lafwind</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

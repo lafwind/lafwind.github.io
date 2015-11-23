@@ -1,0 +1,114 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Lafwind - Rails 中的 cache（一）</title>
+    <link href="../stylesheets/all.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/blog_article.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/normalize.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/syntax.css" rel="stylesheet" type="text/css" /><link href="../stylesheets/syntax_jekyll.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/all.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="blog_detail">
+      <div class="bar_line">
+      </div>
+      <header>
+        <nav>
+<a href="../blog.html">            <span>&lt&lt</span> Blog
+</a>        </nav>
+      </header>
+      <div class="article">
+        <div class="blog_title">
+          <p>Rails 中的 cache（一）</p>
+        </div>
+        <div class="blog_time">
+          <p>Jun 22, 2015</p>
+        </div>
+
+        <div class="content">
+          <p>其实，写这篇文章，自己有点心虚……首先，内容有点大；其次，我几乎没有在Rails中使用cache的经验= =，因为项目还没有这个需要T.T（Donald Knuth曾说过“过早的优化是万恶之源”，这是自我安慰吗～？），但是由于这几天都在看有关优化方面的内容，比如 <a href="http://thenewstack.io/how-to-write-ruby-faster-at-the-source-code-level/">How To Write Ruby Faster at the Source Code Level</a>，<a href="https://github.com/JuanitoFatas/fast-ruby">fast-ruby</a> 以及cache相关的内容，所以就想把相关内容记录下来，以备将来之需！</p>
+
+<p>p.s.：之所以在未经充分实践就把文章写下来的最主要原因是：平时自己就喜欢乱看东西，比如曾经看了haskell，go等，但由于没有实践，现在都差不多忘了，以至于白白浪费了之前的学习，为了避免重蹈覆辙，决定把学到的东西（不管开始用没）记录下来，当之后用到时也能通过这些文章更快地进入状态，这也是我之前说的想要写博客的原因之一；而这也从另一方面督促自己，还有很多东西没做呢！要把时间花在刀刃上！</p>
+
+<p>言归正传，就如上文所说，cache的内容有点多，有服务器端的、客户端的及一些页面相关的，在此次文章中，我主要想看看rails中的<a href="http://guides.rubyonrails.org/caching_with_rails.html">Fragment Caching</a>。这种缓存是把视图逻辑中的一部分打包到cache块中，之后的请求就会从缓存中取得这部分的内容。比如在一个图片网站中（像<a href="https://impage.herokuapp.com/">Impage</a> ; )），一般情况，图片的内容是不会变的，但是评论的内容则会慢慢增加，这种情况下，就可以将图片部分的相关视图缓存起来，而不用每次都像数据库发出请求，以此提高速度。代码方面如下：</p>
+<pre class="highlight haml"><code># example
+<span class="p">-</span> <span class="n">cache</span> <span class="p">[</span><span class="vi">@post</span><span class="p">]</span>
+  <span class="nt">%p</span><span class="p">=</span> <span class="vi">@post</span><span class="p">.</span><span class="nf">title</span>
+  <span class="nt">%span</span><span class="p">=</span> <span class="vi">@post</span><span class="p">.</span><span class="nf">user</span><span class="p">.</span><span class="nf">email</span>
+  <span class="p">-</span> <span class="vi">@post</span><span class="p">.</span><span class="nf">tag_list</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">tag</span><span class="o">|</span>
+    <span class="p">=</span> <span class="n">link_to</span> <span class="s2">"</span><span class="si">#{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">root_path</span><span class="p">(</span><span class="ss">tag: </span><span class="n">tag</span><span class="p">),</span> <span class="ss">class: </span><span class="s2">"btn"</span>
+  <span class="p">=</span> <span class="n">image_tag</span> <span class="vi">@post</span><span class="p">.</span><span class="nf">image</span><span class="p">.</span><span class="nf">url</span><span class="p">(</span><span class="ss">:large</span><span class="p">)</span>
+  <span class="nt">%p</span><span class="p">=</span> <span class="vi">@post</span><span class="p">.</span><span class="nf">description</span>
+
+</code></pre>
+
+<p>上面是一个使用fragment caching的例子，而cache[@post]会生成类似下列的key：</p>
+
+<p><code>views/posts/3-20150616162219</code>，这个键包含模型名，post的id和最后更新时间updated_at，所以当post出现更新时（即updated_at更改），这个post才会生成一个新的缓存，而旧的缓存就不再管理，等到缓存满了后会利用LRU自动清理。</p>
+
+<p>除了上述的自动更新缓存外，也可以利用<code>expire_fragment</code>方法来手动清除缓存。</p>
+
+<p>以上是fragment cache的一些基本内容。试想在这样一种情况下：缓存了一个大页面，此时有一个小小的section更新了，那么这个大页面的缓存也必须得更新，这样显然降低了效率。应对这种情况，rails提供了嵌套方式来重用缓存，如：</p>
+<pre class="highlight haml"><code># example 伪代码
+<span class="p">-</span> <span class="n">cache</span> <span class="p">[</span><span class="vi">@posts</span><span class="p">]</span>
+  <span class="p">-</span> <span class="vi">@posts</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
+    <span class="p">-</span> <span class="n">cache</span> <span class="n">post</span>
+</code></pre>
+
+<p>这样当有一个post更新时，就仅更新该post的缓存，然后重新和其他post的缓存（沿用之前的）拼接，提高了效率，这种机制称为Russian Doll机制（套娃机制）。而在1:1或1：n（belongs_to）的情况下，比如：</p>
+<pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">Item</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+    <span class="n">belongs_to</span> <span class="ss">:list</span>
+<span class="k">end</span>
+</code></pre>
+
+<p>此时，在item更新时，并不会提示list的缓存也更新，解决的方法是利用touch属性：</p>
+<pre class="highlight ruby"><code><span class="k">class</span> <span class="nc">Item</span> <span class="o">&lt;</span> <span class="no">Activerecord</span><span class="o">::</span><span class="no">Base</span>
+    <span class="n">belongs_to</span> <span class="ss">:list</span><span class="p">,</span> <span class="ss">touch: </span><span class="kp">true</span>
+<span class="k">end</span>
+</code></pre>
+
+<p>这样，当item更新，list也会跟着更新，有关套娃机制的内容，请参看Ruby-China上的<a href="https://ruby-china.org/topics/21488">说说 Rails 的套娃缓存机制</a>。</p>
+
+<p>上述就是这两天对于fragment cache的学习，之后会对其进行实践，如有新的理解，会接着更新。而后续也会对其他cache进行学习。</p>
+
+        </div>
+
+      </div>
+
+      <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+//<![CDATA[
+                  var disqus_shortname = 'lafwind';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+        <script type="text/javascript">
+//<![CDATA[
+    var disqus_shortname = 'lafwind';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script>
+
+      </div>
+
+      <footer>
+        <p>©2015 Lafwind </p>
+        <p>Theme is designed by <a href="../">Lafwind</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

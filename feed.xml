@@ -5,14 +5,58 @@
   <id>http://lafwind.github.io</id>
   <link href="http://lafwind.github.io"/>
   <link href="http://lafwind.github.io/feed.xml" rel="self"/>
-  <updated>2015-07-03T20:44:00+08:00</updated>
+  <updated>2015-11-19T23:43:00+08:00</updated>
   <author>
     <name>Lafwind</name>
   </author>
   <entry>
+    <title>关于 Impage</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/impage.html"/>
+    <id>http://lafwind.github.io/blog/impage.html</id>
+    <published>2015-11-19T23:43:00+08:00</published>
+    <updated>2015-11-19T23:57:58+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html"></content>
+  </entry>
+  <entry>
+    <title>近期总结</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/summary-at-20151110.html"/>
+    <id>http://lafwind.github.io/blog/summary-at-20151110.html</id>
+    <published>2015-11-10T23:35:00+08:00</published>
+    <updated>2015-11-10T23:37:24+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html"></content>
+  </entry>
+  <entry>
+    <title>The Webpack Tutorial</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/the-webpack-tutorial.html"/>
+    <id>http://lafwind.github.io/blog/the-webpack-tutorial.html</id>
+    <published>2015-11-05T23:10:00+08:00</published>
+    <updated>2015-11-05T23:11:03+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html"></content>
+  </entry>
+  <entry>
+    <title>Number of trailing zeros of N!</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/number-of-trailing-zeros-of-n.html"/>
+    <id>http://lafwind.github.io/blog/number-of-trailing-zeros-of-n.html</id>
+    <published>2015-07-16T22:21:00+08:00</published>
+    <updated>2015-07-16T22:27:07+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html"></content>
+  </entry>
+  <entry>
     <title>2015下半年计划</title>
-    <link rel="alternate" href="http://lafwind.github.io/the-second-half-of-2015.html"/>
-    <id>http://lafwind.github.io/the-second-half-of-2015.html</id>
+    <link rel="alternate" href="http://lafwind.github.io/blog/the-second-half-of-2015.html"/>
+    <id>http://lafwind.github.io/blog/the-second-half-of-2015.html</id>
     <published>2015-07-03T20:44:00+08:00</published>
     <updated>2015-07-06T16:00:54+08:00</updated>
     <author>
@@ -55,8 +99,8 @@
   </entry>
   <entry>
     <title>Rails 中的 cache（一）</title>
-    <link rel="alternate" href="http://lafwind.github.io/cache-in-rails.html"/>
-    <id>http://lafwind.github.io/cache-in-rails.html</id>
+    <link rel="alternate" href="http://lafwind.github.io/blog/cache-in-rails.html"/>
+    <id>http://lafwind.github.io/blog/cache-in-rails.html</id>
     <published>2015-06-22T23:52:00+08:00</published>
     <updated>2015-06-25T00:54:18+08:00</updated>
     <author>
@@ -106,124 +150,6 @@
 &lt;p&gt;这样，当item更新，list也会跟着更新，有关套娃机制的内容，请参看Ruby-China上的&lt;a href="https://ruby-china.org/topics/21488"&gt;说说 Rails 的套娃缓存机制&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;上述就是这两天对于fragment cache的学习，之后会对其进行实践，如有新的理解，会接着更新。而后续也会对其他cache进行学习。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>My tools</title>
-    <link rel="alternate" href="http://lafwind.github.io/my-tools.html"/>
-    <id>http://lafwind.github.io/my-tools.html</id>
-    <published>2015-06-11T23:01:00+08:00</published>
-    <updated>2015-06-15T17:15:09+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;工欲善其事，必先利其器。下面是一些自己在日常开发中用到的工具：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Linux
-大概在2012年9月份的时候开始使用Linux当自己的主力操作系统，用的是ubuntu发行版。之后的折腾也都是基于ubuntu上的。先从ubuntu跑到kubuntu，再到现在的&lt;a href="http://www.elementary.io/"&gt;Elementary OS&lt;/a&gt;。总体来说感觉很好，尤其是开发，在命令行下能解决大部分问题。虽然没有啥游戏，但好在自己不是很好这一口~&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Gvim/Vim
-用Gvim/Vim的历史可以追溯到自己的高中时期 = =，虽然那时自己不搞开发，但是对所有新鲜的软件都很感兴趣，vim就是其中之一，虽然它的历史比我还长，但是在遇到它时，它对我而言是全新的。之后偶尔用它来处理文本（hjkl的训练在那时完成），Firefox上也装了Vimperator，瞬间幻觉自己X格提高了不少……之后把系统从windows切换到linux后，vim就顺理成章的成为自己的主力编辑器。没事就折腾代码配色，操作配置，有关插件等，直到它变得越来越顺手。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Emacs
-没错，你没看错，我没打错，我们都没错（&lt;del&gt;，错的是这个世界~&lt;/del&gt;），除了vim，我还使用emacs……之所以使用它是因为在上面学习了些lisp，虽然lisp还没学好（会继续的！），但却把emacs配置得差不多……其实在使用过程中最大的收获还是知道了和vim完全不同的emacs的快捷键，而这一套快捷键不止可以在emacs中使用，在其他地方也有用武之地，比如命令行里同样支持C-a、C-e、C-f、C-b等的操作，而在Intellij idea IDE中，同样可以选择使用emacs的快捷键。而这也着实能在日常操作中提高效率（命令行），虽然相对于vim编辑时的高效，emacs的快捷键可能还有些差距（个人认为），但对于键盘党来说，仍然值得拥有！&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;zsh &amp;amp; tmux
-其实bash用得也蛮顺的，但是zsh着实帮我提高了不少效率。zsh的配置用的是&lt;a href="https://github.com/robbyrussell/oh-my-zsh"&gt;oh-my-zsh&lt;/a&gt;，当然自己也根据情况进行了些修改。不过就像部分用户所说，oh-my-zsh好像有点重，一开始启动有时会比较慢。tmux被我拿来给终端分屏，不用每次开那么多的Terminal。开发Rails时，server运行一屏，vim一屏，console和普通命令行界面共享一屏（分居左右），用快捷键切换，很好。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Firefox &amp;amp; Chrome
-Firefox大概从它的1.x版本开始用。配合着Vimperator、adblock plus等插件，用起来爽爽的。直到去年，在调某个网页的效果时，发现其和chrome的渲染好像还是有点差别的（更喜欢chrome的渲染），遂把主力浏览器换成chrome。对chrome的认识从它发布的那天开始，这主要是由于我曾经有很长一段时间陷入到寻找浏览器的坑里，手里主要用着Firefox，但是什么Opera，基于IE内核的其他浏览器、Safari等都没事就被我翻起来用用，再用用，这其中的原因当然是偶尔对手头的Firefox有不满 = =。所以chrome一出来，我就试用了，但由于不顺手（主要就是没有Firefox中Vimperator这种对我来说杀手级的add-on），最后还是回到Firefox怀抱。&lt;/p&gt;
-
-&lt;p&gt;顺便说说，我之所以如此喜欢Vimperator，除了它能给我在浏览器中带来接近vim的高效操作外，还有就是它能让Firefox变得十分简洁，只有tab栏和命令栏，网页的可视界面很大，而且用起来很酷~~&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;上述就是自己在开发时用得主要工具，对我来说，它们能满足我的现有需求，而对于有些人来说可能还不够，这是正常的，每个人都有属于自己的独特需求嘛，自己用得舒服就好~下面是上述工具的相关配置，有需自取，欢迎交流：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.vimrc"&gt;.vimrc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/tree/master/.emacs.d"&gt;.emacs.d&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.zshrc"&gt;.zshrc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.tmux.conf"&gt;.tmux.conf&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.vimperatorrc"&gt;.vimperatorrc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</content>
-  </entry>
-  <entry>
-    <title>生活需要总结</title>
-    <link rel="alternate" href="http://lafwind.github.io/thinking-in-life-20150609.html"/>
-    <id>http://lafwind.github.io/thinking-in-life-20150609.html</id>
-    <published>2015-06-09T23:16:00+08:00</published>
-    <updated>2015-06-16T16:44:44+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;吾日三省吾身，谈谈近期的一些生活感想吧。&lt;/p&gt;
-
-&lt;p&gt;前两天在网上闲逛，不小心闯进了一个技术博客。内容写得很好，再看了下About页面，瞬间被震惊了……高中生……只能扶额捂脸。虽然高中时自己也对IT方面的内容感兴趣，但都流于表面，没事装装新的软件，配置成自己喜欢的样子……或者看看各大IT公司有没有出啥好玩的新东西，然后见识虽然广了，但都是些虚的 = =，再看看现在的有些高中生，有点悔不当初。不过想多了也没用，不是有句话这样说嘛，从现在开始的每一天都是你有生之年最年轻的时刻，所以只能干了！&lt;/p&gt;
-
-&lt;p&gt;最近都在听podcast，有英文的，也有中文的。英文的一般第一遍都听得不是很懂，只能多听几遍，不过由于没懂，往往每次都有新的收获，顺便也练练英文～中文的听起来就没这么费劲，学到的东西也很多～听大牛们有深度的“闲话瞎扯”，有技术内容的，有设计相关的，有自然科学的，有人文历史的，不得不感叹他们的知识广度和深度，而从谈话内容和主持人、嘉宾身上也能找到之后努力的方向和改变对一些事物的看法。真的很有裨益。&lt;/p&gt;
-
-&lt;p&gt;关于学习，这段时间仍然着重于Ruby和Rails。没事复习复习&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby"&gt;元编程&lt;/a&gt;，看看Ruby-China上的一些精华技术贴，或者是打开&lt;a href="http://devdocs.io/"&gt;Devdocs&lt;/a&gt;看看Ruby的一些相关文档。对于其他新技术，也有关注，尤其前端，尤其JS，当然还有之前说的Rust。最近在新项目中，尝试使用haml和sass代替html和css，的确很爽，有时间再试试slim。JS要好好学，当然还有CoffeeScript。计算机底层的东西也要好好修炼，《SICP》整天压在书包里，是时候再续前缘了！前段时间买的《Redis设计与实现》也不要浪费，看看C，看看数据结构，看看Redis。发现自己对Redis这种短小精悍的东西很有好感，vim就是一个典型的例子。&lt;/p&gt;
-
-&lt;p&gt;然后也开始想看一些设计相关的书籍，比如&lt;a href="http://book.douban.com/subject/3323633/"&gt;《写给大家看的设计书》&lt;/a&gt;，毕竟自己还是很希望能够做出有设计感、优雅漂亮的网页。说到设计，想起之前听的某期podcast中主持人关于设计的讨论，一个设计师设计出一个扁平化（时下潮流，当然，仍有些设计是坚持拟物的）的网页是基于其对美的追求还是只是追随时尚？设计是应该领导潮流的还是基于潮流的基础？关于这个问题，我个人的看法是设计有大有小，大的引领潮流，小的在潮流里追求极致，设计师也是普通人，也有追求时尚的权利，只要他们做的设计是他们觉得美丽的事物即可。当然，一个只是一味符合市场需求而无法坚持本心（对于美的追求）的设计师不是一个好的设计师。&lt;/p&gt;
-
-&lt;p&gt;上述是近期生活的一个概况，平平淡淡，但经过瞎想，也能咀嚼出点味儿来～思考生活，然后继续生活吧。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Rust</title>
-    <link rel="alternate" href="http://lafwind.github.io/rust.html"/>
-    <id>http://lafwind.github.io/rust.html</id>
-    <published>2015-06-07T23:30:00+08:00</published>
-    <updated>2015-06-15T17:02:37+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;&lt;a href="http://www.rust-lang.org/"&gt;Rust&lt;/a&gt;这门语言在它还是0.4版本的时候就听过，应该是看到一些关于新兴语言的讨论才注意到的。由于当时语言特性还没定下来，也没怎么去看，就当知道有这么一门和Golang同辈的语言。&lt;/p&gt;
-
-&lt;p&gt;再之后就是到去年8月份，暑假的时候，在网上瞎溜达，又看到了一篇关于Rust的教程，大致瞄了几眼，此时它还处于0.1x版本，就想着等它1.0正式版的时候，再回来学学。&lt;/p&gt;
-
-&lt;p&gt;之所以想学这门语言，有如下原因吧：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;很多很酷的人说它很酷。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;想学一门系统编程语言。觉得系统型语言更能接触到计算机的底层，帮助了解计算机的内部，扎实基础（修炼内功），虽然自己比较喜欢web开发方面的内容，但夯实的基础应该能够帮助自己成为更好的开发者。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;它很新~&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;基于上述原因，在5月16日Rust 1.0版本发布后，就一直想找机会学学。在写下这篇文章的时候，自己刚刚看了Rust官方提供的book的前两章并跟着写了几个例子，感受如下：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;安装容易。因为自己是在Linux下安装的，照着&lt;a href="http://www.rust-lang.org/install.html"&gt;官方的命令行安装教程&lt;/a&gt;，一条命令就足够了：&lt;/p&gt;
-&lt;pre class="highlight shell"&gt;&lt;code&gt; &lt;span class="nv"&gt;$ &lt;/span&gt;curl -sSf https://static.rust-lang.org/rustup.sh | sh
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href="https://crates.io/"&gt;Cargo&lt;/a&gt;很好用。利用Cargo可以很快的新建一个Rust项目，并进行项目的相关配置。这一点和Rails很像，这可能是由于Cargo的作者也具有Ruby的背景吧～&lt;/p&gt;
-&lt;pre class="highlight shell"&gt;&lt;code&gt; &lt;span class="nv"&gt;$ &lt;/span&gt;Cargo new hello --bin
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;语法和C有点相似，但仅仅就是看起来像，细节内容方面还是不同的。个人还是比较喜欢这种风格的（还有&lt;code&gt;do...end&lt;/code&gt;这样的）。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;符号很多，比较复杂，可能是自己还未深入了解语法细节和，就只跟着写了几行代码的缘故。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;上述就是写了几段rust代码的一些感受，都是一些浅显的东西，对于常听说的“所有权”、“并发”等相关概念的内容，虽有接触了解，但毕竟还未深入，等之后学到了再说。总体来说，经过这个小尝试和一些“客观的软文”的介绍，还是对rust这门语言充满兴趣的，期待后续学习。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Gem or Not</title>
-    <link rel="alternate" href="http://lafwind.github.io/two-ways-of-building-rails-app.html"/>
-    <id>http://lafwind.github.io/two-ways-of-building-rails-app.html</id>
-    <published>2015-06-05T22:14:00+08:00</published>
-    <updated>2015-06-15T17:04:54+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;玩Ruby on Rails一段时间了，一直是所有代码自己手写（不借助其他gem，当然rails原生的还是要用的~），这段时间为了熟悉各种gem，把一些相应的功能都用gem来替代，也算完成了一个项目。&lt;/p&gt;
-
-&lt;p&gt;而这两种方式也给我带来了不同的感受：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;手写相应的逻辑代码能够让自己对该功能有更具体的认识，比如关于注册登入登出等功能，手写的就能对session、cookie等内容有深入了解，而如果直接利用&lt;a href="https://github.com/plataformatec/devise"&gt;Devise&lt;/a&gt;这个gem，则这些内容对于自己就相当于黑箱，虽然也能够完成功能。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;利用gem可以更快速的实现功能。比如本次项目从开始到基本完成所有功能大概就只花了大概3个小时（不包括页面设计）。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;手写代码更容易定制或扩展功能，而利用gem虽然读完相应的文档也能在该gem的支持下实现部分扩展功能，但仍然会有些限制。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;上述三点就是通过两种不同方式完成项目的一些感受，总结一下，如果需要快速完成项目原型或后期相应功能不需要太大改变，可以多利用gem，但是当之后需要有不断扩展时，可能自己实现会更好一些（当然如果允许，也可以深入hack相关的gem）。还有，学习阶段应多自己手动完成功能以取得更多的进步。&lt;/p&gt;
 </content>
   </entry>
 </feed>
