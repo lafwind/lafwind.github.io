@@ -1,0 +1,185 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Lafwind - About-Git</title>
+    <meta name="viewport" content="width=device-width" />
+    <link href="../stylesheets/all.css" rel="stylesheet" /><link href="../stylesheets/blog_article.css" rel="stylesheet" /><link href="../stylesheets/normalize.css" rel="stylesheet" /><link href="../stylesheets/syntax.css" rel="stylesheet" /><link href="../stylesheets/syntax_jekyll.css" rel="stylesheet" />
+    <link href="../stylesheets/responsive_blog_article.css" rel="stylesheet" media="screen and (max-width: 900px)" />
+    <script src="../javascripts/all.js"></script>
+
+    <!-- Source Han Sans Simplified Chinese -->
+    <!--     <script src="https://use.typekit.net/oqv5rhf.js"></script>
+         <script>try{Typekit.load({ async: true });}catch(e){}</script> -->
+  </head>
+  <body>
+    <div id="blog_detail">
+      <div class="bar_line">
+      </div>
+      <header>
+        <nav>
+<a href="../blog.html">            <span>&lt&lt</span> Blog
+</a>        </nav>
+      </header>
+      <div class="article">
+        <div class="blog_title">
+          <p>About-Git</p>
+        </div>
+        <div class="blog_time">
+          <p>May 23, 2016</p>
+        </div>
+
+        <div class="content">
+          <p>平时写代码都用 <strong>Git</strong> 管理版本。但之前一直秉承着够用就好的态度，所以也没有太深入，这段时间刚好看了些资料，才发现有时 git 用得卡手，主要是自己姿势不对。介于这番‘大彻大悟’，决定好好总结一下对于 git 的使用。</p>
+
+<h3>git add</h3>
+
+<p><code>git add</code> 应该是平日里用得最多的命令。之前一直是都是完成一个 feature 或修复一个 bug 后，来个 <code>git add -A</code> 或 <code>git add filename</code>，然后就直接 commit。这应该是最一般的流程。但有时也会遇到在完成一个 feature 时，顺便把一个 bug 解决了，这是如果要 commit 的话，就尴尬了。因为如果一下全部 commit 的话，破坏了‘小步快跑’的开发模式，对之后代码的维护不好。当然也可以把修复 bug 的代码改回来（<code>git checkout filename</code> 此处可用，它能取消文件变更，回到没修改前的状态），先把 feature 提交了，再来 commit 修复 bug 的代码，这样虽然可以解决问题，但显得有点笨（‘懒’程序员才是好程序员）。这时候，可以使用 <code>git add -p</code>，此时会出现命令行相关提示，把还未提交的代码与 staging area 的代码进行 diff，并对每一处 diff 向你询问是否 add。这样的话，你就能把不同功能块的代码分开提交，然后分别 commit。（p.s.： <code>git add file</code> 那么也可以完成类似工作，但粒度只到文件级别）</p>
+
+<p>还有，有时我们会不小心把多余的文件 <code>git add</code>，这时我们需要把它从 staging area（文件分为untracked - git 不知道它的存在、not staged - git 知道它的存在，但它被修改了还未add、staged - 已被 add） 中移除出来，但也不能直接<code>rm file</code>（文件我们还需要的～）或<code>git rm file</code>（文件我们还要 track），此时给<code>git rm</code>加个参数<code>--cached</code>就能很好的帮我们完成任务。</p>
+
+<h3>git stash</h3>
+
+<p>当正在写一个 feature 时，有用户反映一个紧急 bug，必须马上解决。此时就可以使用 <code>git stash</code> 这个命令，他能把当下未提交的改动暂存到某神秘地方，这样代码库就回到还未更改时的状态，然后就可先解决紧急 bug。当解决完问题后，<code>git stash pop</code> 就可以恢复之前那些未提交的内容。</p>
+
+<h3>git commit &ndash;amend</h3>
+
+<p>当提交完一次 commit 后，发现有个属于该次 commit 的变动未提交，新手的作法一般会是把遗漏的变更提交了，然后再 commit 一次，但是这样前一次的 commit 就不完整了。此时可以在 commit 时使用 <code>git commit --amend</code>，当命令执行时，会调用默认编辑器（用 <code>git config --global core.editor editor_name</code> 设置）编辑前一次的 commit message，修改（或不修改）后保存退出，这样就只会 commit 一次，并把忘记提交的代码也提交。</p>
+
+<p>p.s.: 这个动作会修改 commit id（SHA-1 校验和），如果此时本次 commit 的代码已经推送到服务器，那么服务器信息就会和本地不一致，导致下次 push 出错，所以需谨慎。</p>
+
+<h3>git reset</h3>
+
+<p><code>git reset</code> 这个命令不仅可以改变 HEAD</p>
+
+<ul>
+<li><p><code>git reset HEAD</code> 删除存在于 staging area 中的改动</p></li>
+<li><p><code>git reset HEAD^</code> 回到上一个版本，删除当前版本（加 <code>--soft</code> 参数可以把相应 commit 的内容继续保存在 staging area 中）</p></li>
+</ul>
+
+<p>还能把文件从 staging area（已经 <code>git add</code>）移除出来，并且不丢失任何变更： <code>git reset filename</code>。</p>
+
+<h3>git branch</h3>
+
+<p><code>git branch branch_name</code> 可以用来开新分支，默认是基于最新的一次提交，但也可以在指定类似 <code>HEAD~1</code> 的参数使其基于某次提交。</p>
+
+<p><code>git branch -d be_deleted_branch</code> 可以用来删除分支，毕竟分支太多不好管理。</p>
+
+<p>p.s.: <code>git branch</code> 列出所有分支。<code>git checkout branch_name</code> 用来切换分支。可以直接 <code>git checkout -b branch_name</code> 来创建分支+切换。</p>
+
+<h3>git log</h3>
+
+<ul>
+<li><p><code>git log</code> 可以看git的commit记录</p></li>
+<li><p><code>git log branch_name</code> 可以看某分支的 commit 记录</p></li>
+<li><p><code>git log branch_name -p filename</code> 可以看 branch_name 分支上有关 filename 文件的 log</p></li>
+<li><p><code>git log --oneline</code> 可以用简短模式看 log</p></li>
+</ul>
+
+<h3>git diff</h3>
+
+<ul>
+<li><p><code>git diff</code> 用来查看 unstage 和 stage 的 diff</p></li>
+<li><p><code>git diff --cached</code> 用来查看 stage 和已 commit 的 diff</p></li>
+</ul>
+
+<h3>git cherry-pick</h3>
+
+<p><code>git cherry-pick commit_id</code>，其中 commit_id 是某次 commit 的 SHA-1 校验和。这个命令可以把某 commit 摘出来，合并到当前分支。</p>
+
+<h3>git reflog</h3>
+
+<p><code>git reflog</code> 可以查看在版本库上的操作，配合 <code>git cherry-pick</code>，可以把扔掉的 commit 重新捡回来～</p>
+
+<h4>git rebase</h4>
+
+<p><code>git rebase master feature</code> 可以把 feature 分支 rebase 到 master 分支上。这个命令和 <code>git merge</code> 的区别可透过下面例子说明：</p>
+
+<p>B 分支是基于 A 分支创建，假设现在处于 C1 这个 commit，之后两个分支分别又进行了两次 commit，此时 A 为 C1 -&gt; C2 -&gt; C3， B 为 C1 -&gt; C4 -&gt; C5：</p>
+
+<ul>
+<li><p>如果 <code>git rebase A B</code> 或 <code>git checkout B + git rebase A</code>，这些命令会把 B 中的每个 commit（C4，C5）取消掉，并把它们临时保存为补丁（C4&#39;、C5&rsquo;,在 .git/rebase 目录中），再把 B 分支更新为最新的 A 分支，最后再把保存的补丁（C4&#39;， C5&#39;）应用到 A 分支上。所以此时 commit 的顺序从新到旧应该是：C5&rsquo; -&gt; C4&rsquo; -&gt; C3 -&gt; C2 -&gt; C1</p></li>
+<li><p>如果 &lsquo;git merge &#39;，不会有上述的过程，commit 的顺序也按照C1、C2、C3、C4、C5提交的时间来定。</p></li>
+</ul>
+
+<p><code>git rebase -i HEAD~n</code>这个命令会打开编辑器，前 n 行为最近 n 次的 commit 记录，类似<strong>pick a666666 commit_message</strong>。</p>
+
+<ul>
+<li><p>调换行的内容可以调换提交顺序</p></li>
+<li><p>把 某次 commit 的 <strong><u>pick</u></strong> 该为 <strong><u>r</u></strong>（reword），保存退出再重新进入编辑器，此时可以更改 commit 信息（p.s.：当次修改以及介于修改之间的 commit id 都重新计算）</p></li>
+<li><p>把 某次 commit 的 <strong><u>pick</u></strong> 该为 <strong><u>s</u></strong>（squash），保存退出再重新进入编辑器，此时可以把该次 commit 合并到它的前一个 commit，并可修改 commit message。</p></li>
+</ul>
+
+<h3>git clean</h3>
+
+<ul>
+<li><p><code>git clean -n</code> 列出有将要被删除的未被追踪的文件或资料夹，不包括 .gitignore 里的文件。</p></li>
+<li><p><code>git clean -fd</code> 删除未被追踪的文件或资料夹，不包括 .gitignore 里的文件。</p></li>
+</ul>
+
+<h3>git merge</h3>
+
+<p><code>git merge branch_name --squash</code> + <code>git commit -m &#39;merge branch_name&#39;</code> 可以把一个分支合并到当前分支，并且重新写 commit message（当前分支只有这个 commit message）。</p>
+
+<h3>协作</h3>
+
+<ul>
+<li><p><code>git remote add origin url</code> 添加 remote repo。</p></li>
+<li><p><code>git remote</code> 可以列出当前的 remote repo，加个参数 <code>-v</code>即<code>git remote -v</code>可以获得 remote repo 的 URL。</p></li>
+<li><p><code>git pull origin master</code> 把别人提交的代码拉到本地。（可添加 <code>--rebase</code> 参数，该参数效果同 <code>git rebase</code>）</p></li>
+<li><p><code>git push origin branch_name</code> 把 branch_name 上提交的代码 push 到远程仓库。（有时可以把一些还不能并入主分支的代码提交到远程给别人 review）</p></li>
+<li><p><code>git fetch origin</code> 取得远程仓库的更新，但并不会合并到本地仓库。</p></li>
+<li><p><code>git revert commit_id</code> 可以把 push 到远程的有问题的 commit 恢复。</p></li>
+</ul>
+
+<h3>git grep</h3>
+
+<p><code>git grep &quot;TODO&quot;</code> 可以把编码过程中注释的 TODO 列出来。</p>
+
+<h3>git blame filename</h3>
+
+<p><code>git blame filename</code> 可以找到文件某行代码的最后修改者～</p>
+
+        </div>
+
+      </div>
+
+      <div class="comments">
+        <div id='disqus_thread'></div>
+<script type='text/javascript'>
+//<![CDATA[
+                  var disqus_shortname = 'lafwind';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script>
+<noscript>Please enable JavaScript to view the <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a></noscript>
+<a href='http://disqus.com' class='dsq-brlink'>comments powered by <span class='logo-disqus'>Disqus</span></a>
+
+        <script type="text/javascript">
+//<![CDATA[
+    var disqus_shortname = 'lafwind';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script>
+
+      </div>
+
+      <footer>
+        <p>©2015 Lafwind </p>
+        <p>Theme is designed by <a href="../">Lafwind</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
