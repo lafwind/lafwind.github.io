@@ -5,53 +5,141 @@
   <id>http://lafwind.github.io</id>
   <link href="http://lafwind.github.io"/>
   <link href="http://lafwind.github.io/feed.xml" rel="self"/>
-  <updated>2015-11-26T23:43:00+08:00</updated>
+  <updated>2016-05-23T23:09:00+08:00</updated>
   <author>
     <name>Lafwind</name>
   </author>
   <entry>
-    <title>近期总结</title>
-    <link rel="alternate" href="http://lafwind.github.io/blog/summary-at-2015-11-26.html"/>
-    <id>http://lafwind.github.io/blog/summary-at-2015-11-26.html</id>
-    <published>2015-11-26T23:43:00+08:00</published>
-    <updated>2015-11-26T23:44:03+08:00</updated>
+    <title>About-Git</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/about-git.html"/>
+    <id>http://lafwind.github.io/blog/about-git.html</id>
+    <published>2016-05-23T23:09:00+08:00</published>
+    <updated>2016-06-07T22:19:54+08:00</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <content type="html"></content>
-  </entry>
-  <entry>
-    <title>关于 Impage</title>
-    <link rel="alternate" href="http://lafwind.github.io/blog/impage.html"/>
-    <id>http://lafwind.github.io/blog/impage.html</id>
-    <published>2015-11-19T23:43:00+08:00</published>
-    <updated>2015-11-19T23:57:58+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html"></content>
+    <content type="html">&lt;p&gt;平时写代码都用 &lt;strong&gt;Git&lt;/strong&gt; 管理版本。但之前一直秉承着够用就好的态度，所以也没有太深入，这段时间刚好看了些资料，才发现有时 git 用得卡手，主要是自己姿势不对。介于这番‘大彻大悟’，决定好好总结一下对于 git 的使用。&lt;/p&gt;
+
+&lt;h3&gt;git add&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git add&lt;/code&gt; 应该是平日里用得最多的命令。之前一直是都是完成一个 feature 或修复一个 bug 后，来个 &lt;code&gt;git add -A&lt;/code&gt; 或 &lt;code&gt;git add filename&lt;/code&gt;，然后就直接 commit。这应该是最一般的流程。但有时也会遇到在完成一个 feature 时，顺便把一个 bug 解决了，这是如果要 commit 的话，就尴尬了。因为如果一下全部 commit 的话，破坏了‘小步快跑’的开发模式，对之后代码的维护不好。当然也可以把修复 bug 的代码改回来（&lt;code&gt;git checkout filename&lt;/code&gt; 此处可用，它能取消文件变更，回到没修改前的状态），先把 feature 提交了，再来 commit 修复 bug 的代码，这样虽然可以解决问题，但显得有点笨（‘懒’程序员才是好程序员）。这时候，可以使用 &lt;code&gt;git add -p&lt;/code&gt;，此时会出现命令行相关提示，把还未提交的代码与 staging area 的代码进行 diff，并对每一处 diff 向你询问是否 add。这样的话，你就能把不同功能块的代码分开提交，然后分别 commit。（p.s.： &lt;code&gt;git add file&lt;/code&gt; 那么也可以完成类似工作，但粒度只到文件级别）&lt;/p&gt;
+
+&lt;p&gt;还有，有时我们会不小心把多余的文件 &lt;code&gt;git add&lt;/code&gt;，这时我们需要把它从 staging area（文件分为untracked - git 不知道它的存在、not staged - git 知道它的存在，但它被修改了还未add、staged - 已被 add） 中移除出来，但也不能直接&lt;code&gt;rm file&lt;/code&gt;（文件我们还需要的～）或&lt;code&gt;git rm file&lt;/code&gt;（文件我们还要 track），此时给&lt;code&gt;git rm&lt;/code&gt;加个参数&lt;code&gt;--cached&lt;/code&gt;就能很好的帮我们完成任务。&lt;/p&gt;
+
+&lt;h3&gt;git stash&lt;/h3&gt;
+
+&lt;p&gt;当正在写一个 feature 时，有用户反映一个紧急 bug，必须马上解决。此时就可以使用 &lt;code&gt;git stash&lt;/code&gt; 这个命令，他能把当下未提交的改动暂存到某神秘地方，这样代码库就回到还未更改时的状态，然后就可先解决紧急 bug。当解决完问题后，&lt;code&gt;git stash pop&lt;/code&gt; 就可以恢复之前那些未提交的内容。&lt;/p&gt;
+
+&lt;h3&gt;git commit &amp;ndash;amend&lt;/h3&gt;
+
+&lt;p&gt;当提交完一次 commit 后，发现有个属于该次 commit 的变动未提交，新手的作法一般会是把遗漏的变更提交了，然后再 commit 一次，但是这样前一次的 commit 就不完整了。此时可以在 commit 时使用 &lt;code&gt;git commit --amend&lt;/code&gt;，当命令执行时，会调用默认编辑器（用 &lt;code&gt;git config --global core.editor editor_name&lt;/code&gt; 设置）编辑前一次的 commit message，修改（或不修改）后保存退出，这样就只会 commit 一次，并把忘记提交的代码也提交。&lt;/p&gt;
+
+&lt;p&gt;p.s.: 这个动作会修改 commit id（SHA-1 校验和），如果此时本次 commit 的代码已经推送到服务器，那么服务器信息就会和本地不一致，导致下次 push 出错，所以需谨慎。&lt;/p&gt;
+
+&lt;h3&gt;git reset&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt; 这个命令不仅可以改变 HEAD&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git reset HEAD&lt;/code&gt; 删除存在于 staging area 中的改动&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git reset HEAD^&lt;/code&gt; 回到上一个版本，删除当前版本（加 &lt;code&gt;--soft&lt;/code&gt; 参数可以把相应 commit 的内容继续保存在 staging area 中）&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;还能把文件从 staging area（已经 &lt;code&gt;git add&lt;/code&gt;）移除出来，并且不丢失任何变更： &lt;code&gt;git reset filename&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h3&gt;git branch&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git branch branch_name&lt;/code&gt; 可以用来开新分支，默认是基于最新的一次提交，但也可以在指定类似 &lt;code&gt;HEAD~1&lt;/code&gt; 的参数使其基于某次提交。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;git branch -d be_deleted_branch&lt;/code&gt; 可以用来删除分支，毕竟分支太多不好管理。&lt;/p&gt;
+
+&lt;p&gt;p.s.: &lt;code&gt;git branch&lt;/code&gt; 列出所有分支。&lt;code&gt;git checkout branch_name&lt;/code&gt; 用来切换分支。可以直接 &lt;code&gt;git checkout -b branch_name&lt;/code&gt; 来创建分支+切换。&lt;/p&gt;
+
+&lt;h3&gt;git log&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git log&lt;/code&gt; 可以看git的commit记录&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git log branch_name&lt;/code&gt; 可以看某分支的 commit 记录&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git log branch_name -p filename&lt;/code&gt; 可以看 branch_name 分支上有关 filename 文件的 log&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git log --oneline&lt;/code&gt; 可以用简短模式看 log&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;git diff&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git diff&lt;/code&gt; 用来查看 unstage 和 stage 的 diff&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git diff --cached&lt;/code&gt; 用来查看 stage 和已 commit 的 diff&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;git cherry-pick&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git cherry-pick commit_id&lt;/code&gt;，其中 commit_id 是某次 commit 的 SHA-1 校验和。这个命令可以把某 commit 摘出来，合并到当前分支。&lt;/p&gt;
+
+&lt;h3&gt;git reflog&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git reflog&lt;/code&gt; 可以查看在版本库上的操作，配合 &lt;code&gt;git cherry-pick&lt;/code&gt;，可以把扔掉的 commit 重新捡回来～&lt;/p&gt;
+
+&lt;h4&gt;git rebase&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;git rebase master feature&lt;/code&gt; 可以把 feature 分支 rebase 到 master 分支上。这个命令和 &lt;code&gt;git merge&lt;/code&gt; 的区别可透过下面例子说明：&lt;/p&gt;
+
+&lt;p&gt;B 分支是基于 A 分支创建，假设现在处于 C1 这个 commit，之后两个分支分别又进行了两次 commit，此时 A 为 C1 -&amp;gt; C2 -&amp;gt; C3， B 为 C1 -&amp;gt; C4 -&amp;gt; C5：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;如果 &lt;code&gt;git rebase A B&lt;/code&gt; 或 &lt;code&gt;git checkout B + git rebase A&lt;/code&gt;，这些命令会把 B 中的每个 commit（C4，C5）取消掉，并把它们临时保存为补丁（C4&amp;#39;、C5&amp;rsquo;,在 .git/rebase 目录中），再把 B 分支更新为最新的 A 分支，最后再把保存的补丁（C4&amp;#39;， C5&amp;#39;）应用到 A 分支上。所以此时 commit 的顺序从新到旧应该是：C5&amp;rsquo; -&amp;gt; C4&amp;rsquo; -&amp;gt; C3 -&amp;gt; C2 -&amp;gt; C1&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如果 &amp;lsquo;git merge &amp;#39;，不会有上述的过程，commit 的顺序也按照C1、C2、C3、C4、C5提交的时间来定。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;git rebase -i HEAD~n&lt;/code&gt;这个命令会打开编辑器，前 n 行为最近 n 次的 commit 记录，类似&lt;strong&gt;pick a666666 commit_message&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;调换行的内容可以调换提交顺序&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;把 某次 commit 的 &lt;strong&gt;&lt;u&gt;pick&lt;/u&gt;&lt;/strong&gt; 该为 &lt;strong&gt;&lt;u&gt;r&lt;/u&gt;&lt;/strong&gt;（reword），保存退出再重新进入编辑器，此时可以更改 commit 信息（p.s.：当次修改以及介于修改之间的 commit id 都重新计算）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;把 某次 commit 的 &lt;strong&gt;&lt;u&gt;pick&lt;/u&gt;&lt;/strong&gt; 该为 &lt;strong&gt;&lt;u&gt;s&lt;/u&gt;&lt;/strong&gt;（squash），保存退出再重新进入编辑器，此时可以把该次 commit 合并到它的前一个 commit，并可修改 commit message。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;git clean&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git clean -n&lt;/code&gt; 列出有将要被删除的未被追踪的文件或资料夹，不包括 .gitignore 里的文件。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git clean -fd&lt;/code&gt; 删除未被追踪的文件或资料夹，不包括 .gitignore 里的文件。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;git merge&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git merge branch_name --squash&lt;/code&gt; + &lt;code&gt;git commit -m &amp;#39;merge branch_name&amp;#39;&lt;/code&gt; 可以把一个分支合并到当前分支，并且重新写 commit message（当前分支只有这个 commit message）。&lt;/p&gt;
+
+&lt;h3&gt;协作&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git remote add origin url&lt;/code&gt; 添加 remote repo。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git remote&lt;/code&gt; 可以列出当前的 remote repo，加个参数 &lt;code&gt;-v&lt;/code&gt;即&lt;code&gt;git remote -v&lt;/code&gt;可以获得 remote repo 的 URL。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git pull origin master&lt;/code&gt; 把别人提交的代码拉到本地。（可添加 &lt;code&gt;--rebase&lt;/code&gt; 参数，该参数效果同 &lt;code&gt;git rebase&lt;/code&gt;）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git push origin branch_name&lt;/code&gt; 把 branch_name 上提交的代码 push 到远程仓库。（有时可以把一些还不能并入主分支的代码提交到远程给别人 review）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git fetch origin&lt;/code&gt; 取得远程仓库的更新，但并不会合并到本地仓库。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;git revert commit_id&lt;/code&gt; 可以把 push 到远程的有问题的 commit 恢复。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;git grep&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git grep &amp;quot;TODO&amp;quot;&lt;/code&gt; 可以把编码过程中注释的 TODO 列出来。&lt;/p&gt;
+
+&lt;h3&gt;git blame filename&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;git blame filename&lt;/code&gt; 可以找到文件某行代码的最后修改者～&lt;/p&gt;
+</content>
   </entry>
   <entry>
     <title>The Webpack Tutorial</title>
     <link rel="alternate" href="http://lafwind.github.io/blog/the-webpack-tutorial.html"/>
     <id>http://lafwind.github.io/blog/the-webpack-tutorial.html</id>
     <published>2015-11-05T23:10:00+08:00</published>
-    <updated>2015-11-05T23:11:03+08:00</updated>
+    <updated>2016-06-12T16:24:57+08:00</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <content type="html"></content>
-  </entry>
-  <entry>
-    <title>Number of trailing zeros of N!</title>
-    <link rel="alternate" href="http://lafwind.github.io/blog/number-of-trailing-zeros-of-n.html"/>
-    <id>http://lafwind.github.io/blog/number-of-trailing-zeros-of-n.html</id>
-    <published>2015-07-16T22:21:00+08:00</published>
-    <updated>2015-07-16T22:27:07+08:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html"></content>
+    <content type="html">&lt;p&gt;坑～&lt;/p&gt;
+</content>
   </entry>
   <entry>
     <title>2015下半年计划</title>
@@ -150,6 +238,65 @@
 &lt;p&gt;这样，当item更新，list也会跟着更新，有关套娃机制的内容，请参看Ruby-China上的&lt;a href="https://ruby-china.org/topics/21488"&gt;说说 Rails 的套娃缓存机制&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;上述就是这两天对于fragment cache的学习，之后会对其进行实践，如有新的理解，会接着更新。而后续也会对其他cache进行学习。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>My tools</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/my-tools.html"/>
+    <id>http://lafwind.github.io/blog/my-tools.html</id>
+    <published>2015-06-11T23:01:00+08:00</published>
+    <updated>2015-06-15T17:15:09+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;工欲善其事，必先利其器。下面是一些自己在日常开发中用到的工具：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Linux
+大概在2012年9月份的时候开始使用Linux当自己的主力操作系统，用的是ubuntu发行版。之后的折腾也都是基于ubuntu上的。先从ubuntu跑到kubuntu，再到现在的&lt;a href="http://www.elementary.io/"&gt;Elementary OS&lt;/a&gt;。总体来说感觉很好，尤其是开发，在命令行下能解决大部分问题。虽然没有啥游戏，但好在自己不是很好这一口~&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Gvim/Vim
+用Gvim/Vim的历史可以追溯到自己的高中时期 = =，虽然那时自己不搞开发，但是对所有新鲜的软件都很感兴趣，vim就是其中之一，虽然它的历史比我还长，但是在遇到它时，它对我而言是全新的。之后偶尔用它来处理文本（hjkl的训练在那时完成），Firefox上也装了Vimperator，瞬间幻觉自己X格提高了不少……之后把系统从windows切换到linux后，vim就顺理成章的成为自己的主力编辑器。没事就折腾代码配色，操作配置，有关插件等，直到它变得越来越顺手。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Emacs
+没错，你没看错，我没打错，我们都没错（&lt;del&gt;，错的是这个世界~&lt;/del&gt;），除了vim，我还使用emacs……之所以使用它是因为在上面学习了些lisp，虽然lisp还没学好（会继续的！），但却把emacs配置得差不多……其实在使用过程中最大的收获还是知道了和vim完全不同的emacs的快捷键，而这一套快捷键不止可以在emacs中使用，在其他地方也有用武之地，比如命令行里同样支持C-a、C-e、C-f、C-b等的操作，而在Intellij idea IDE中，同样可以选择使用emacs的快捷键。而这也着实能在日常操作中提高效率（命令行），虽然相对于vim编辑时的高效，emacs的快捷键可能还有些差距（个人认为），但对于键盘党来说，仍然值得拥有！&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;zsh &amp;amp; tmux
+其实bash用得也蛮顺的，但是zsh着实帮我提高了不少效率。zsh的配置用的是&lt;a href="https://github.com/robbyrussell/oh-my-zsh"&gt;oh-my-zsh&lt;/a&gt;，当然自己也根据情况进行了些修改。不过就像部分用户所说，oh-my-zsh好像有点重，一开始启动有时会比较慢。tmux被我拿来给终端分屏，不用每次开那么多的Terminal。开发Rails时，server运行一屏，vim一屏，console和普通命令行界面共享一屏（分居左右），用快捷键切换，很好。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Firefox &amp;amp; Chrome
+Firefox大概从它的1.x版本开始用。配合着Vimperator、adblock plus等插件，用起来爽爽的。直到去年，在调某个网页的效果时，发现其和chrome的渲染好像还是有点差别的（更喜欢chrome的渲染），遂把主力浏览器换成chrome。对chrome的认识从它发布的那天开始，这主要是由于我曾经有很长一段时间陷入到寻找浏览器的坑里，手里主要用着Firefox，但是什么Opera，基于IE内核的其他浏览器、Safari等都没事就被我翻起来用用，再用用，这其中的原因当然是偶尔对手头的Firefox有不满 = =。所以chrome一出来，我就试用了，但由于不顺手（主要就是没有Firefox中Vimperator这种对我来说杀手级的add-on），最后还是回到Firefox怀抱。&lt;/p&gt;
+
+&lt;p&gt;顺便说说，我之所以如此喜欢Vimperator，除了它能给我在浏览器中带来接近vim的高效操作外，还有就是它能让Firefox变得十分简洁，只有tab栏和命令栏，网页的可视界面很大，而且用起来很酷~~&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上述就是自己在开发时用得主要工具，对我来说，它们能满足我的现有需求，而对于有些人来说可能还不够，这是正常的，每个人都有属于自己的独特需求嘛，自己用得舒服就好~下面是上述工具的相关配置，有需自取，欢迎交流：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.vimrc"&gt;.vimrc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/tree/master/.emacs.d"&gt;.emacs.d&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.zshrc"&gt;.zshrc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.tmux.conf"&gt;.tmux.conf&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://github.com/lafwind/dotfile/blob/master/.vimperatorrc"&gt;.vimperatorrc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
+  <entry>
+    <title>生活需要总结</title>
+    <link rel="alternate" href="http://lafwind.github.io/blog/thinking-in-life-20150609.html"/>
+    <id>http://lafwind.github.io/blog/thinking-in-life-20150609.html</id>
+    <published>2015-06-09T23:16:00+08:00</published>
+    <updated>2015-06-16T16:44:44+08:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;吾日三省吾身，谈谈近期的一些生活感想吧。&lt;/p&gt;
+
+&lt;p&gt;前两天在网上闲逛，不小心闯进了一个技术博客。内容写得很好，再看了下About页面，瞬间被震惊了……高中生……只能扶额捂脸。虽然高中时自己也对IT方面的内容感兴趣，但都流于表面，没事装装新的软件，配置成自己喜欢的样子……或者看看各大IT公司有没有出啥好玩的新东西，然后见识虽然广了，但都是些虚的 = =，再看看现在的有些高中生，有点悔不当初。不过想多了也没用，不是有句话这样说嘛，从现在开始的每一天都是你有生之年最年轻的时刻，所以只能干了！&lt;/p&gt;
+
+&lt;p&gt;最近都在听podcast，有英文的，也有中文的。英文的一般第一遍都听得不是很懂，只能多听几遍，不过由于没懂，往往每次都有新的收获，顺便也练练英文～中文的听起来就没这么费劲，学到的东西也很多～听大牛们有深度的“闲话瞎扯”，有技术内容的，有设计相关的，有自然科学的，有人文历史的，不得不感叹他们的知识广度和深度，而从谈话内容和主持人、嘉宾身上也能找到之后努力的方向和改变对一些事物的看法。真的很有裨益。&lt;/p&gt;
+
+&lt;p&gt;关于学习，这段时间仍然着重于Ruby和Rails。没事复习复习&lt;a href="https://github.com/lafwind/notes_of_metaprogramming_ruby"&gt;元编程&lt;/a&gt;，看看Ruby-China上的一些精华技术贴，或者是打开&lt;a href="http://devdocs.io/"&gt;Devdocs&lt;/a&gt;看看Ruby的一些相关文档。对于其他新技术，也有关注，尤其前端，尤其JS，当然还有之前说的Rust。最近在新项目中，尝试使用haml和sass代替html和css，的确很爽，有时间再试试slim。JS要好好学，当然还有CoffeeScript。计算机底层的东西也要好好修炼，《SICP》整天压在书包里，是时候再续前缘了！前段时间买的《Redis设计与实现》也不要浪费，看看C，看看数据结构，看看Redis。发现自己对Redis这种短小精悍的东西很有好感，vim就是一个典型的例子。&lt;/p&gt;
+
+&lt;p&gt;然后也开始想看一些设计相关的书籍，比如&lt;a href="http://book.douban.com/subject/3323633/"&gt;《写给大家看的设计书》&lt;/a&gt;，毕竟自己还是很希望能够做出有设计感、优雅漂亮的网页。说到设计，想起之前听的某期podcast中主持人关于设计的讨论，一个设计师设计出一个扁平化（时下潮流，当然，仍有些设计是坚持拟物的）的网页是基于其对美的追求还是只是追随时尚？设计是应该领导潮流的还是基于潮流的基础？关于这个问题，我个人的看法是设计有大有小，大的引领潮流，小的在潮流里追求极致，设计师也是普通人，也有追求时尚的权利，只要他们做的设计是他们觉得美丽的事物即可。当然，一个只是一味符合市场需求而无法坚持本心（对于美的追求）的设计师不是一个好的设计师。&lt;/p&gt;
+
+&lt;p&gt;上述是近期生活的一个概况，平平淡淡，但经过瞎想，也能咀嚼出点味儿来～思考生活，然后继续生活吧。&lt;/p&gt;
 </content>
   </entry>
 </feed>

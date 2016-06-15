@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <title>My Resume</title>
-    <link href="stylesheets/all.css" rel="stylesheet" type="text/css" /><link href="stylesheets/resume.css" rel="stylesheet" type="text/css" /><link href="stylesheets/normalize.css" rel="stylesheet" type="text/css" />
+    <meta name="viewport" content="width=device-width" />
+    <link href="stylesheets/all.css" rel="stylesheet" /><link href="stylesheets/resume.css" rel="stylesheet" /><link href="stylesheets/normalize.css" rel="stylesheet" />
+    <link href="stylesheets/responsive_resume.css" rel="stylesheet" media="screen and (max-width: 699px)" />
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="javascripts/all.js"></script>
 
@@ -18,10 +20,10 @@
           李高峰
         </div>
         <div class="header_intro">
-          <p>男，现居江苏南京</p>
+          <p>男，现居上海</p>
           <p>热爱：编程、Ruby on Rails、生活、音乐、阅读、羽毛球</p>
           <p>邮箱：lafwind@gmail.com</p>
-          <p>电话：18205095976</p>
+          <p>电话：18616955365</p>
           <p>博客：<a href="http://lafwind.github.io">lafwind.github.io</a></p>
           <p>Github：<a href="https://github.com/lafwind">lafwind</a></p>
         </div>
@@ -37,13 +39,29 @@
           <div class="section_detail_for_key">
             <div class="key">
               <p>学校：</p>
-              <p>院系：</p>
-              <p>平均成绩：</br>
             </div>
 
             <div class="value">
               <p>南京大学</p>
+            </div>
+          </div>
+
+          <div class="section_detail_for_key">
+            <div class="key">
+              <p>院系：</p>
+            </div>
+
+            <div class="value">
               <p>计算机科学与技术系（2011 - 2015，本科）</p>
+            </div>
+          </div>
+
+          <div class="section_detail_for_key">
+            <div class="key">
+              <p>平均成绩：</br>
+            </div>
+
+            <div class="value">
               <p>80.142 / 100</p>
             </div>
           </div>
@@ -69,8 +87,10 @@
               Impage
             </div>
             <div class="intro">
-              利用Ruby on Rails搭建的一个分享图片网站。用Devise等gem实现用户登录、投票、收藏、添加标签等功能。页面访问量统计用Redis实现。用Haml、Sass完成前端开发。<br />
-              <a href="https://github.com/lafwind/impage">项目地址</a>，<a  href="https://impage.herokuapp.com/">演示（部署在Heroku，下同）</a>。
+              利用Ruby on Rails搭建的一个分享图片网站。用Devise等gem实现用户登录、投票、收藏、添加标签等功能。页面访问量统计用Redis实现。用Haml、Sass完成前端开发。
+              <div class="useful_link">
+                <a href="https://github.com/lafwind/impage">项目地址</a>，<a  href="https://impage.herokuapp.com/">演示（部署在Heroku，下同）</a>。
+              </div>
             </div>
 
             <div class="item">
@@ -78,15 +98,19 @@
             </div>
             <div class="intro">
               一个收藏、发现有趣网站的网络收藏夹。用Ruby on Rails搭建，实现用户登入，公开或私有书签，投票及按不同标准进行书签排序等功能。
-              <a href="https://github.com/lafwind/share_link">项目地址</a>，<a  href="https://share-link.herokuapp.com/">演示</a>。
+              <div class="useful_link">
+                <a href="https://github.com/lafwind/share_link">项目地址</a>，<a  href="https://share-link.herokuapp.com/">演示</a>。
+              </div>
             </div>
 
             <div class="item">
               Github Detail
             </div>
             <div class="intro">
-              用AngularJs实现的一个查询用户在Github上相关信息的网站。页面布局采用bootstrap实现。<br />
-              <a href="https://github.com/lafwind/github_detail">项目地址</a>，<a  href="https://github-detail.herokuapp.com/">演示</a>。
+              用AngularJs实现的一个查询用户在Github上相关信息的网站。页面布局采用bootstrap实现。
+              <div class="useful_link">
+                <a href="https://github.com/lafwind/github_detail">项目地址</a>，<a  href="https://github-detail.herokuapp.com/">演示</a>。
+              </div>
             </div>
 
             <div class="item">
@@ -94,7 +118,9 @@
             </div>
             <div class="intro">
               一个可将用户输入进行翻译或查询的微信公众号应用。利用Rails和weixin_rails_middleware gem实现。翻译调用有道翻译API实现。
-              <a href="https://github.com/lafwind/simple_weixin_app">项目地址</a>。
+              <div class="useful_link">
+                <a href="https://github.com/lafwind/simple_weixin_app">项目地址</a>。
+              </div>
             </div>
 
           </div>
@@ -164,15 +190,21 @@
           <div class="section_detail_for_key">
             <div class="key">
               <p>语言：</p>
+            </div>
+            <div class="value">
+              <p>英语（4级），阅读英文文档及相关文献无障碍；普通话</p>
+            </div>
+          </div>
+          <div class="section_detail_for_key">
+            <div class="key">
               <p>性格：</p>
             </div>
             <div class="value">
-              <p>英语（4级），阅读英文文档及相关文献无障碍；普通话；粤语；闽南语</p>
               <p>稳重踏实，对新鲜事物（包括但不限于技术）充满好奇</p>
             </div>
           </div>
         </div>
       </div>
 
-    </body>
-  </html>
+  </body>
+</html>
