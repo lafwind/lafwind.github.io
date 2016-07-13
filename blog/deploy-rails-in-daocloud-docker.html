@@ -1,0 +1,170 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Lafwind - 在 DaoCloud（Docker） 上部署 Rails 应用</title>
+    <meta name="viewport" content="width=device-width" />
+    <link href="../stylesheets/all.css" rel="stylesheet" /><link href="../stylesheets/blog_article.css" rel="stylesheet" /><link href="../stylesheets/normalize.css" rel="stylesheet" /><link href="../stylesheets/syntax.css" rel="stylesheet" /><link href="../stylesheets/syntax_jekyll.css" rel="stylesheet" />
+    <link href="../stylesheets/responsive_blog_article.css" rel="stylesheet" media="screen and (max-width: 900px)" />
+    <script src="../javascripts/all.js"></script>
+
+    <!-- Source Han Sans Simplified Chinese -->
+    <!--     <script src="https://use.typekit.net/oqv5rhf.js"></script>
+         <script>try{Typekit.load({ async: true });}catch(e){}</script> -->
+  </head>
+  <body>
+    <div id="blog_detail">
+      <div class="bar_line">
+      </div>
+      <header>
+        <nav>
+<a href="../blog.html">            <span>&lt&lt</span> Blog
+</a>        </nav>
+      </header>
+      <div class="article">
+        <div class="blog_title">
+          <p>在 DaoCloud（Docker） 上部署 Rails 应用</p>
+        </div>
+        <div class="blog_time">
+          <p>Jul 12, 2016</p>
+        </div>
+
+        <div class="content">
+          <p>前几日 Rails 5 正式发布，便用其写了个小的<a href="http://lafwind-chat.daoapp.io/">聊天室</a>（<a href="https://github.com/lafwind/chat">源码</a>），当然，中间用到了 ActionCable。应用写完想着像之前的其他应用一样把它部署到 Heroku 上面，但发现当需要安装相应的 Redis add-on 时，需要进行信用卡方面的账号核实，而自己本身又没有信用卡= =，所以这一想法算是泡汤了。经过上网查询，发现将其放在 DaoCloud 上是个不错的想法，遂决定实行。</p>
+
+<h3>正文</h3>
+
+<p>由于把应用部署到 DaoCloud 需先生成一个 Docker 镜像，而 DaoCloud 在这方面已经帮你准备得差不多，只需要自己写一份 Dockerfile，配置一下所需的环境，这点倒不难，对 Dockerfile 相关指令（查<a href="https://docs.docker.com/engine/reference/builder/">文档</a>，或找一份<a href="https://github.com/lafwind/chat/blob/master/Dockerfile">样本</a>看一下）和命令行熟悉的应该一下就上手了。以下是我为这次项目写的 Dockerfile：</p>
+<pre class="highlight plaintext"><code>
+FROM ubuntu:14.04
+MAINTAINER Lafwind Li "lafwind@gmail.com"
+
+RUN apt-get update
+# 使用 postgresql 需要安装 libpq-dev、postgresql，如使用其他数据库，根据需要安装其他库
+RUN apt-get -y install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev libpq-dev postgresql
+
+# 安装 nodejs, rails 需要 javascript runtime
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+RUN apt-get install -y nodejs
+ENV PATH /usr/bin/nodejs:$PATH
+RUN nodejs -v
+
+RUN cd
+
+# 用 rbenv 安装 ruby
+RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv
+RUN git clone https://github.com/rbenv/ruby-build.git /root/.rbenv/plugins/ruby-build
+RUN ./root/.rbenv/plugins/ruby-build/install.sh
+ENV PATH /root/.rbenv/bin:$PATH
+RUN echo 'eval "$(rbenv init -)"' &gt;&gt; /etc/profile.d/rbenv.sh
+RUN echo 'eval "$(rbenv init -)"' &gt;&gt; .bashrc
+RUN echo 'eval "$(rbenv init -)"' &gt;&gt; $HOME/.bash_profile
+RUN rbenv install 2.3.1
+RUN rbenv global 2.3.1
+ENV PATH /root/.rbenv/shims:$PATH
+RUN ruby -v
+RUN gem install --no-rdoc --no-ri bundler
+RUN rbenv rehash
+
+# copy app， 把代码仓库（github、bitbucket）拉到指定文件夹
+RUN mkdir -pv /my_app
+WORKDIR /my_app
+ADD ./ /my_app/chat
+WORKDIR /my_app/chat
+
+RUN bundle install -V
+
+# setting ENV
+ENV RACK_ENV="production" RAILS_ENV="production"
+
+# 为安全考量在运行时才产生 SECRET KEY，而不是一开始就设定在相关 yaml 文档里并 push 到公开仓库（本人在 github 上只有公开仓库= =）
+ENV SECRET_KEY_BASE $(rails secret)
+ENV DEVISE_SECRET_KEY $(rails secret)
+
+# 给 start.sh 执行权限
+RUN chmod 777 start.sh
+
+RUN rails assets:precompile
+EXPOSE 80
+
+CMD ["sh", "/my_app/chat/start.sh"]
+</code></pre>
+
+<p>有了上述的 Dockerfile，将它放在项目的根目录下（DaoCloud 预设 Dockerfile 放在根目录，也可以自己指定）。</p>
+
+<p>然后我们就可以据此部署我们的应用了：</p>
+
+<ul>
+<li><p>将本地代码 push 到远端仓库</p></li>
+<li><p>登录 DaoCloud 后点击 <em>代码构建</em>，并 <em>创建新项目</em></p></li>
+<li><p>填入项目名称，并指定远端仓库的源代码，此时需要连接你的 Github 或相关账号</p></li>
+<li><p>之后选择执行环境等。P.S.：根据我的个人经验（可能不具普适性），执行环境选国外比较好，速度差别还是挺大的</p></li>
+<li><p>接着点击<em>开始创建</em></p></li>
+<li><p>创建结束并不会马上执行，预设触发规则是在 git 提交 tag 的后根据根目录下的 Dockerfile（可在流程定义里更改路径） 进行构建（可在触发规则下进行修改），如执行下列命令将会创建相应 tag 的镜像：</p></li>
+<li><pre class="highlight shell"><code><span class="gp">$ </span>git tag -a v1.0.0 -m <span class="s1">'version 1.0.0'</span>
+<span class="gp">$ </span>git push origin master --tags
+</code></pre></li>
+</ul>
+
+<ul>
+<li><p>镜像构建完成后（时间不定，与执行环境的选择有关），就可根据该进项创建新应用。点击<em>应用列表</em>，并<em>创建应用</em></p></li>
+<li><p>选择创建成功的镜像进行部署</p></li>
+<li><p>由于这个项目中使用到 Postgresql 和 Redis，可以先在<em>服务集成</em>中创建相应的服务（此处是 Postgresql 和 Redis）</p></li>
+<li><p>在应用部署中需要在配置里绑定相应服务（此处是刚刚创建的两个服务）</p></li>
+<li><p>此时会生成相应服务的环境变量，这些环境变量可以直接在源代码里通过 <code>ENV[&#39;xxx&#39;]</code> 进行引用；同时也可手动创建环境变量方便项目使用（比如在 cable.yml 中 Redis 所需的 url 可根据服务所提供的 Redis 相关数据进行组合并赋值给手动创建的环境变量
+REDIS_URL，然后直接 yaml 文档中以 <code>&lt;%= ENV[&#39;REDIS_URL&#39;] =&gt;</code> 的方式使用）</p></li>
+<li><p>完成这些设定后（有些细节设定根据自己需求进行选择）即可进行部署</p></li>
+<li><p>部署完成后应用的启动命令是 Dockerfile 中 CMD，在本例中是执行 <em>start.sh</em>，可在该脚本中执行 rails 的相关命令，如 <code>rails db:migrate</code> 或 启动服务器（如 puma）等</p></li>
+</ul>
+
+<p>上述就是整个部署的大致过程，部署成功后会得到一个 DaoCloud 提供的二级域名，如果需要可自己绑定顶级域名，然后就可根据域名进行访问啦！</p>
+
+<h3>参考</h3>
+
+<ul>
+<li><a href="https://ruby-china.org/topics/26313">在 DaoCloud 上部署 Rails App</a></li>
+</ul>
+
+        </div>
+
+      </div>
+
+      <div class="comments">
+        <div id='disqus_thread'></div>
+<script type='text/javascript'>
+//<![CDATA[
+                  var disqus_shortname = 'lafwind';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script>
+<noscript>Please enable JavaScript to view the <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a></noscript>
+<a href='http://disqus.com' class='dsq-brlink'>comments powered by <span class='logo-disqus'>Disqus</span></a>
+
+        <script type="text/javascript">
+//<![CDATA[
+    var disqus_shortname = 'lafwind';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script>
+
+      </div>
+
+      <footer>
+        <p>©2015 Lafwind </p>
+        <p>Theme is designed by <a href="../">Lafwind</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
