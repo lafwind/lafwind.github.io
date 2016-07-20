@@ -1,0 +1,136 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Lafwind - Ruby 中的 self</title>
+    <meta name="viewport" content="width=device-width" />
+    <link href="../stylesheets/all.css" rel="stylesheet" /><link href="../stylesheets/blog_article.css" rel="stylesheet" /><link href="../stylesheets/normalize.css" rel="stylesheet" /><link href="../stylesheets/syntax.css" rel="stylesheet" /><link href="../stylesheets/syntax_jekyll.css" rel="stylesheet" />
+    <link href="../stylesheets/responsive_blog_article.css" rel="stylesheet" media="screen and (max-width: 900px)" />
+    <script src="../javascripts/all.js"></script>
+
+    <!-- Source Han Sans Simplified Chinese -->
+    <!--     <script src="https://use.typekit.net/oqv5rhf.js"></script>
+         <script>try{Typekit.load({ async: true });}catch(e){}</script> -->
+  </head>
+  <body>
+    <div id="blog_detail">
+      <div class="bar_line">
+      </div>
+      <header>
+        <nav>
+<a href="../blog.html">            <span>&lt&lt</span> Blog
+</a>        </nav>
+      </header>
+      <div class="article">
+        <div class="blog_title">
+          <p>Ruby 中的 self</p>
+        </div>
+        <div class="blog_time">
+          <p>Jul 17, 2016</p>
+        </div>
+
+        <div class="content">
+          <blockquote>
+<p>“知人者智，自知者明”</p>
+</blockquote>
+
+<p>为人处事当如此，在 Ruby 代码中是亦如此。清楚 <code>self</code> 为何物有助于更好地理解和写出正确的 Ruby 代码。</p>
+
+<p><code>self</code> 在 Ruby 程序中代表着此时所处位置的当前对象。而具体位置可分以下几种情况：</p>
+
+<ul>
+<li><p>在实例方法中，此时 <code>self</code> 指向调用该方法的对象</p></li>
+<li><p>不在类中的方法内，<code>self</code> 指向顶级上下文 <code>main</code> 对象</p></li>
+<li><p>在类中， 但不在实例方法中，此时 <code>self</code> 指向当前的类（因此此时定义的变量为类实例变量，是属于这个类的）</p></li>
+<li><p>即不在类中，也不在方法内，此时 <code>self</code> 指向顶级上下文 <code>main</code></p></li>
+<li><p>在块内，<code>self</code> 所指与此块外层的 <code>self</code>所指一致</p></li>
+</ul>
+
+<p>以下为例：</p>
+<pre class="highlight ruby"><code><span class="nb">p</span> <span class="nb">self</span> <span class="c1"># main</span>
+<span class="mi">1</span><span class="p">.</span><span class="nf">times</span> <span class="p">{</span> <span class="nb">p</span> <span class="nb">self</span> <span class="p">}</span> <span class="c1"># main</span>
+
+<span class="k">def</span> <span class="nf">m1</span>
+  <span class="nb">p</span> <span class="nb">self</span>
+  <span class="mi">1</span><span class="p">.</span><span class="nf">times</span> <span class="p">{</span> <span class="nb">p</span> <span class="nb">self</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">A</span>
+  <span class="nb">p</span> <span class="nb">self</span> <span class="c1"># A</span>
+  <span class="mi">1</span><span class="p">.</span><span class="nf">times</span> <span class="p">{</span> <span class="nb">p</span> <span class="nb">self</span> <span class="p">}</span> <span class="c1"># A</span>
+
+  <span class="k">def</span> <span class="nf">m</span>
+    <span class="nb">p</span> <span class="nb">self</span>
+    <span class="mi">1</span><span class="p">.</span><span class="nf">times</span> <span class="p">{</span> <span class="nb">p</span> <span class="nb">self</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">m1</span> <span class="c1"># 输出两行，皆为 main</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="no">A</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">m</span> <span class="c1"># 输出两行，皆指向 a</span>
+</code></pre>
+
+<p>以上就是 <code>self</code> 在程序中各位置所指的具体对象，明白了这点，对于 Ruby 代码中各种方法、变量的归属也会有更清晰的认识，对代码也就有了更高的掌控。</p>
+
+<p><em>P.S.1：</em> 除了当前对象 <code>self</code>，Ruby 中还有当前类的存在，定义方法时，该方法会成为当前类的实例方法（单件方法另说）。当用 <code>class</code> 打开一个类时，这个类就成了当前类。</p>
+
+<p><em>P.S.2：</em></p>
+<pre class="highlight ruby"><code><span class="c1"># 例子来自《Ruby 元编程》</span>
+
+<span class="k">class</span>
+  <span class="k">def</span> <span class="nf">method_one</span>
+    <span class="k">def</span> <span class="nf">method_two</span><span class="p">;</span> <span class="s1">'Hello!'</span><span class="p">;</span> <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">obj</span> <span class="o">=</span> <span class="no">MyClass</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">obj</span><span class="p">.</span><span class="nf">method_one</span>
+<span class="n">obj</span><span class="p">.</span><span class="nf">method_two</span> <span class="c1"># "Hello!"</span>
+</code></pre>
+
+<p>此时 <code>method_two</code> 所属的类是 <code>MyClass</code>，这也就是为什么在顶级作用域中定义的方法会成为 Object（<code>main</code> 对象的类） 类实例方法的原因。</p>
+
+        </div>
+
+      </div>
+
+      <div class="comments">
+        <div id='disqus_thread'></div>
+<script type='text/javascript'>
+//<![CDATA[
+                  var disqus_shortname = 'lafwind';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script>
+<noscript>Please enable JavaScript to view the <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a></noscript>
+<a href='http://disqus.com' class='dsq-brlink'>comments powered by <span class='logo-disqus'>Disqus</span></a>
+
+        <script type="text/javascript">
+//<![CDATA[
+    var disqus_shortname = 'lafwind';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script>
+
+      </div>
+
+      <footer>
+        <p>©2015 Lafwind </p>
+        <p>Theme is designed by <a href="../">Lafwind</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
